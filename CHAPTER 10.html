@@ -1,0 +1,2825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flow of Control — C++ Statements Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/default-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+<style>
+:root{
+  --ink:#0E1420;
+  --heading:#171B26;
+  --paper:#F3EFE6;
+  --panel:#FFFFFF;
+  --line:#E3DCC9;
+  --text:#333B4D;
+  --text-soft:#5B6478;
+  --text-faint:#838EA0;
+  --selection:#3D6FE5;
+  --selection-soft:#E3EAFE;
+  --iteration:#0FA9BD;
+  --iteration-soft:#DFF6F8;
+  --jump:#7C4DEF;
+  --jump-soft:#EDE6FF;
+  --code-bg:#0B0F17;
+  --code-line:#232C3C;
+  --sim-accent:#2F8FE0;
+  --sim-accent-soft:#E3F1FC;
+  --practice:#3E86C7;
+  --practice-soft:#E4F0FA;
+  --success:#16B37E;
+  --success-soft:#DEF7EC;
+  --success-text:#0B6B49;
+  --danger:#E5473B;
+  --danger-soft:#FDE7E4;
+  --danger-text:#9A2318;
+  --brand:#E8912F;
+  --brand-dark:#C97418;
+  --brand-soft:#FBEBD3;
+  --topbar-h:64px;
+  --sans:'Source Sans 3',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --radius:10px;
+  --accent: var(--selection);
+  --accent-soft: var(--selection-soft);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+.illustration,.diagram,.simulator,.quiz-box,.predict-card,.debug-card,table.cmp{
+  box-shadow:0 1px 2px rgba(30,20,0,.04), 0 6px 16px rgba(30,20,0,.06);
+}
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--text);
+  background:var(--paper);
+  line-height:1.65;
+  font-size:16.5px;
+}
+h1,h2,h3,h4{
+  font-family:var(--mono);
+  font-weight:600;
+  color:var(--heading);
+  line-height:1.25;
+  letter-spacing:-0.01em;
+}
+p{margin:0 0 1em;max-width:70ch;}
+a{color:inherit;}
+code{font-family:var(--mono);}
+
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:70;
+  height:var(--topbar-h);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:0 24px;
+  background:var(--ink);
+  border-bottom:3px solid var(--brand);
+}
+.topbar-title{
+  font-family:var(--sans);
+  font-weight:700;
+  font-size:18px;
+  color:#F3F2ED;
+  margin:0;
+  line-height:1.2;
+}
+.topbar-sub{
+  font-family:var(--mono);
+  font-size:11.5px;
+  color:#8991A6;
+  margin-top:1px;
+}
+.topbar-right{display:flex;align-items:center;gap:16px;flex-shrink:0;}
+.topbar-progress{display:flex;align-items:center;gap:10px;}
+.topbar-progress-text{font-family:var(--mono);font-size:11.5px;color:#B7BAC6;white-space:nowrap;}
+.topbar-progress-track{width:120px;height:6px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden;}
+.topbar-progress-fill{height:100%;width:0%;background:var(--brand);transition:width .2s;}
+.topbar-lang{
+  font-family:var(--sans);
+  font-weight:600;
+  font-size:13px;
+  padding:7px 16px;
+  border-radius:999px;
+  background:var(--brand);
+  color:#1B1200;
+}
+@media (max-width:700px){
+  .topbar-progress-track{display:none;}
+  .topbar-sub{display:none;}
+}
+
+/* ---------- layout shell ---------- */
+.shell{display:flex;min-height:calc(100vh - var(--topbar-h));}
+
+.sidebar{
+  width:280px;
+  flex-shrink:0;
+  background:var(--ink);
+  color:#D7D9E0;
+  position:sticky;
+  top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h));
+  overflow-y:auto;
+  padding:24px 20px 40px;
+  counter-reset:secnum;
+}
+.sidebar::-webkit-scrollbar{width:6px;}
+.sidebar::-webkit-scrollbar-thumb{background:#3A3F4C;border-radius:4px;}
+.brand{
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:.04em;
+  color:#8991A6;
+  margin-bottom:4px;
+}
+.brand-title{
+  font-family:var(--mono);
+  font-size:20px;
+  font-weight:600;
+  color:#F3F2ED;
+  margin:0 0 26px;
+  line-height:1.3;
+}
+.toc-group{margin-bottom:22px;}
+.toc-group-label{
+  font-family:var(--sans);
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  color:var(--tg-color,#8991A6);
+  padding-left:2px;
+  margin-bottom:8px;
+}
+.toc-group[data-fam="selection"]{--tg-color:#3D6FE5;}
+.toc-group[data-fam="iteration"]{--tg-color:#0FA9BD;}
+.toc-group[data-fam="jump"]{--tg-color:#7C4DEF;}
+.toc-group[data-fam="practice"]{--tg-color:var(--brand);}
+.toc-group ul{list-style:none;margin:0;padding:0;}
+.toc-group li{counter-increment:secnum;}
+.toc-group li a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13.5px;
+  color:#B7BAC6;
+  text-decoration:none;
+  padding:7px 10px;
+  border-radius:8px;
+  transition:background .15s, color .15s;
+}
+.toc-group li a::before{
+  content:counter(secnum);
+  flex-shrink:0;
+  width:22px;height:22px;
+  border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.28);
+  color:#8991A6;
+  font-family:var(--mono);
+  font-size:11px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s, border-color .15s, color .15s;
+}
+.toc-group li a:hover{background:rgba(255,255,255,.06);color:#F3F2ED;}
+.toc-group li a.active{background:rgba(255,255,255,.09);color:#F3F2ED;font-weight:500;}
+.toc-group li a.active::before{
+  background:var(--tg-color,var(--brand));
+  border-color:var(--tg-color,var(--brand));
+  color:var(--ink);
+  font-weight:700;
+}
+
+.nav-toggle{
+  display:none;
+  position:fixed;
+  top:calc(var(--topbar-h) + 12px);left:16px;
+  z-index:50;
+  width:42px;height:42px;
+  background:var(--ink);
+  border:none;
+  border-radius:8px;
+  color:#F3F2ED;
+  font-family:var(--mono);
+  font-size:18px;
+  cursor:pointer;
+}
+
+main{
+  flex:1;
+  min-width:0;
+  padding:0 0 80px;
+}
+
+/* ---------- hero ---------- */
+.hero{
+  padding:70px 64px 50px;
+  border-bottom:1px solid var(--line);
+  background:
+    linear-gradient(180deg, #FFFFFF, var(--paper));
+}
+.hero-eyebrow{
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--text-faint);
+  margin-bottom:14px;
+}
+.hero h1{
+  font-size:44px;
+  margin:0 0 18px;
+  max-width:14ch;
+}
+.hero p.lead{
+  font-family:var(--sans);
+  font-size:17px;
+  color:var(--text-soft);
+  max-width:62ch;
+  margin-bottom:0;
+}
+.hero-tags{
+  display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;
+}
+.tag{
+  font-family:var(--mono);
+  font-size:12px;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  color:var(--text-soft);
+  background:var(--panel);
+}
+.tag.tag-selection{border-color:#3D6FE5;color:#24408F;background:var(--selection-soft);}
+.tag.tag-iteration{border-color:#0FA9BD;color:#0B6572;background:var(--iteration-soft);}
+.tag.tag-jump{border-color:#7C4DEF;color:#4B2FA0;background:var(--jump-soft);}
+
+/* ---------- content sections ---------- */
+.content{padding:0 64px;max-width:900px;}
+section.topic{padding-top:56px;scroll-margin-top:24px;}
+section.topic:first-of-type{padding-top:48px;}
+
+.kicker{
+  font-family:var(--mono);
+  font-size:12.5px;
+  color:var(--accent);
+  margin-bottom:6px;
+}
+h2.section-title{font-size:27px;margin:0 0 6px;}
+h3.sub-title{font-size:19px;margin:34px 0 10px;color:var(--heading);}
+h4.sub-sub-title{font-size:16px;margin:26px 0 8px;color:var(--heading);}
+
+.family-selection .kicker,.family-selection h2, .family-selection h3{color:var(--selection);}
+.family-iteration .kicker,.family-iteration h2, .family-iteration h3{color:var(--iteration);}
+.family-jump .kicker,.family-jump h2, .family-jump h3{color:var(--jump);}
+.family-selection h2,.family-selection h3,.family-selection h4{color:var(--heading);}
+.family-iteration h2,.family-iteration h3,.family-iteration h4{color:var(--heading);}
+.family-jump h2,.family-jump h3,.family-jump h4{color:var(--heading);}
+.family-practice .kicker,.family-practice h2,.family-practice h3{color:var(--practice);}
+.family-practice h2,.family-practice h3,.family-practice h4{color:var(--heading);}
+
+/* syntax box */
+.syntax-box{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-left:4px solid var(--accent);
+  border-radius:8px;
+  padding:16px 18px;
+  font-family:var(--mono);
+  font-size:14px;
+  color:var(--text);
+  margin:16px 0;
+  overflow-x:auto;
+  white-space:pre;
+  line-height:1.6;
+}
+.syntax-row{display:flex;gap:16px;flex-wrap:wrap;}
+.syntax-row .syntax-box{flex:1;min-width:260px;}
+
+/* badge pill, in the spirit of the "TEXTBOOK" label */
+.badge-pill{
+  display:inline-block;
+  font-family:var(--mono);
+  font-weight:600;
+  font-size:10.5px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--brand-dark);
+  background:var(--brand-soft);
+  border-radius:999px;
+  padding:3px 10px;
+  margin-right:10px;
+  vertical-align:middle;
+}
+
+/* code illustration blocks */
+.illustration{
+  margin:20px 0 28px;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:var(--panel);
+}
+.illustration-title{
+  background:var(--panel);
+  color:var(--heading);
+  font-family:var(--sans);
+  font-weight:600;
+  font-size:14.5px;
+  padding:14px 18px;
+  border-bottom:1px solid var(--line);
+}
+.illustration-title::before{
+  content:"EXAMPLE";
+  display:inline-block;
+  font-family:var(--mono);
+  font-weight:600;
+  font-size:10.5px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--brand-dark);
+  background:var(--brand-soft);
+  border-radius:999px;
+  padding:3px 10px;
+  margin-right:10px;
+  vertical-align:middle;
+}
+.illustration pre{
+  margin:0;
+  padding:18px;
+  background:var(--code-bg);
+  overflow-x:auto;
+  font-size:13.5px;
+  line-height:1.65;
+}
+.illustration pre code.hljs{background:transparent;padding:0;}
+.output-block{
+  background:#101319;
+  color:#8FE3B0;
+  font-family:var(--mono);
+  font-size:13.5px;
+  padding:14px 18px;
+  border-top:1px solid var(--code-line);
+}
+.output-block .output-label{
+  color:#6F7789;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  display:block;
+  margin-bottom:6px;
+}
+
+/* note / callout */
+.note{
+  background:#FBF3DF;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:14px 16px;
+  font-size:14.5px;
+  color:var(--text-soft);
+  margin:16px 0;
+}
+.note strong{color:var(--heading);}
+.callout{
+  display:flex;gap:10px;align-items:flex-start;
+  background:var(--accent-soft);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:12px 16px;
+  font-size:14px;
+  color:#24408F;
+  margin:14px 0;
+}
+.family-iteration .callout{color:#0B6572;}
+.family-jump .callout{color:#4B2FA0;}
+
+/* tables */
+table.cmp{
+  width:100%;
+  border-collapse:collapse;
+  margin:18px 0 28px;
+  font-size:14.5px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  overflow:hidden;
+}
+table.cmp th{
+  background:var(--ink);
+  color:#F3F2ED;
+  text-align:left;
+  padding:10px 14px;
+  font-family:var(--mono);
+  font-weight:500;
+  font-size:13px;
+}
+table.cmp td{
+  padding:10px 14px;
+  border-top:1px solid var(--line);
+  vertical-align:top;
+  color:var(--text);
+}
+table.cmp tr:nth-child(even) td{background:#F2EEE3;}
+
+/* ---------- interactive simulator ---------- */
+.simulator{
+  margin:18px 0 30px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--panel);
+}
+.sim-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  padding:10px 16px;
+  background:var(--sim-accent-soft);
+  border-bottom:1px solid var(--line);
+}
+.sim-title{
+  font-family:var(--mono);
+  font-size:13px;
+  font-weight:500;
+  color:#205488;
+}
+.sim-controls{display:flex;align-items:center;gap:8px;}
+.sim-btn{
+  font-family:var(--mono);
+  font-size:12.5px;
+  padding:6px 12px;
+  border-radius:7px;
+  border:1px solid var(--sim-accent);
+  background:#FFFFFF;
+  color:var(--sim-accent);
+  cursor:pointer;
+  transition:background .12s, color .12s;
+}
+.sim-btn:hover{background:var(--sim-accent);color:#FFFFFF;}
+.sim-btn:disabled{opacity:.4;cursor:not-allowed;}
+.sim-btn.primary{background:var(--sim-accent);color:#FFFFFF;}
+.sim-btn.primary:hover{background:#2F7FCB;}
+.sim-step-label{
+  font-family:var(--mono);
+  font-size:11.5px;
+  color:#2B6FA8;
+  min-width:78px;
+}
+.sim-body{
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:0;
+}
+.sim-code{
+  margin:0;
+  padding:16px 0;
+  background:var(--code-bg);
+  color:#C7CEDA;
+  font-family:var(--mono);
+  font-size:13px;
+  line-height:1.7;
+  overflow-x:auto;
+}
+.sim-code .sim-line{
+  display:block;
+  padding:1px 16px;
+}
+.sim-code .sim-line .ln{
+  display:inline-block;
+  width:20px;
+  color:#5C6780;
+  user-select:none;
+}
+.sim-code .sim-line.active-line{
+  background:rgba(62,143,208,.24);
+  border-left:3px solid var(--sim-accent);
+  padding-left:13px;
+  color:#F1F4F9;
+}
+.sim-side{
+  border-left:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+}
+.sim-vars{
+  padding:14px 16px;
+  min-height:60px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-content:flex-start;
+}
+.sim-var{
+  font-family:var(--mono);
+  font-size:12.5px;
+  background:#F2EEE3;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:5px 9px;
+  display:flex;
+  gap:6px;
+}
+.sim-var-name{color:#2B6FA8;}
+.sim-var-val{color:var(--heading);font-weight:600;}
+.sim-hint{font-family:var(--mono);font-size:12.5px;color:var(--text-faint);}
+.sim-output-wrap{padding:14px 16px;flex:1;}
+.sim-output-label{
+  font-family:var(--mono);
+  font-size:10.5px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--text-faint);
+  display:block;
+  margin-bottom:6px;
+}
+.sim-output{
+  font-family:var(--mono);
+  font-size:13px;
+  color:#333B4D;
+  background:#F2EEE3;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:10px 12px;
+  min-height:44px;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+@media (max-width:700px){
+  .sim-body{grid-template-columns:1fr;}
+  .sim-side{border-left:none;border-top:1px solid var(--line);}
+}
+
+/* diagram wrapper */
+.diagram{
+  margin:22px 0 28px;
+  padding:18px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow-x:auto;
+}
+.diagram svg{display:block;margin:0 auto;max-width:100%;height:auto;}
+.diagram-caption{
+  text-align:center;
+  font-family:var(--mono);
+  font-size:12.5px;
+  color:var(--text-faint);
+  margin-top:10px;
+}
+
+/* small flow / arrow row */
+.flow-row{
+  display:flex;
+  align-items:center;
+  gap:0;
+  flex-wrap:wrap;
+  margin:20px 0;
+}
+.flow-box{
+  font-family:var(--mono);
+  font-size:13px;
+  padding:10px 16px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  color:var(--heading);
+  text-align:center;
+}
+.flow-arrow{
+  font-family:var(--mono);
+  font-size:18px;
+  color:var(--text-faint);
+  padding:0 12px;
+}
+
+.rules-list{padding-left:20px;margin:14px 0;}
+.rules-list li{margin-bottom:6px;}
+
+.divider{
+  height:1px;
+  background:var(--line);
+  margin:56px 0 0;
+}
+
+footer{
+  padding:50px 64px 30px;
+  color:var(--text-faint);
+  font-family:var(--mono);
+  font-size:12.5px;
+}
+
+/* ---------- quiz ---------- */
+.quiz-box{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden;margin:18px 0 30px;}
+.quiz-top{display:flex;align-items:center;padding:12px 18px;background:var(--practice-soft);border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;color:#1E4D73;}
+.quiz-count{white-space:nowrap;}
+.quiz-progress-bar{flex:1;height:6px;background:#EEE7D5;border-radius:4px;margin:0 14px;overflow:hidden;}
+.quiz-progress-fill{height:100%;background:var(--practice);width:0%;transition:width .25s;}
+.quiz-score-live{white-space:nowrap;}
+.quiz-body{padding:22px;}
+.quiz-q{font-size:16px;color:var(--heading);margin:0 0 16px;font-weight:500;}
+.quiz-q code{background:#F2EEE3;padding:1px 5px;border-radius:4px;font-size:14px;}
+.quiz-opts{display:flex;flex-direction:column;gap:9px;}
+.quiz-opt{text-align:left;font-family:var(--sans);font-size:14.5px;padding:11px 14px;border-radius:8px;border:1px solid var(--line);background:#FFFFFF;color:var(--text);cursor:pointer;transition:border-color .12s,background .12s;}
+.quiz-opt:hover:not(:disabled){border-color:var(--practice);}
+.quiz-opt:disabled{cursor:default;}
+.quiz-opt.correct{border-color:var(--success);background:var(--success-soft);color:var(--success-text);font-weight:600;}
+.quiz-opt.incorrect{border-color:var(--danger);background:var(--danger-soft);color:var(--danger-text);font-weight:600;}
+.quiz-feedback{margin-top:16px;padding:12px 16px;border-radius:8px;font-size:14px;display:none;line-height:1.55;}
+.quiz-feedback.show{display:block;}
+.quiz-feedback.right{background:var(--success-soft);color:var(--success-text);}
+.quiz-feedback.wrong{background:var(--danger-soft);color:var(--danger-text);}
+.quiz-feedback strong{display:block;font-family:var(--mono);font-size:13px;margin-bottom:4px;}
+.quiz-bottom{display:flex;justify-content:flex-end;padding:14px 22px;border-top:1px solid var(--line);background:#F6F2E7;}
+.quiz-next{font-family:var(--mono);font-size:13px;padding:8px 18px;border-radius:7px;border:1px solid var(--practice);background:var(--practice);color:#FFFFFF;cursor:pointer;}
+.quiz-next:disabled{opacity:.35;cursor:not-allowed;background:#FFFFFF;color:var(--practice);}
+.quiz-score{text-align:center;padding:38px 20px;}
+.quiz-score .big{font-family:var(--mono);font-size:40px;color:var(--practice);margin-bottom:8px;}
+.quiz-score p{max-width:none;color:var(--text-soft);margin:0 auto 20px;}
+.quiz-restart{font-family:var(--mono);font-size:13px;padding:8px 18px;border-radius:7px;border:1px solid var(--practice);background:#FFFFFF;color:var(--practice);cursor:pointer;}
+
+/* ---------- predict the output ---------- */
+.predict-card{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);margin:18px 0 26px;}
+.predict-head{padding:10px 18px;background:var(--practice-soft);font-family:var(--mono);font-size:13px;color:#1E4D73;border-bottom:1px solid var(--line);}
+.predict-body{display:grid;grid-template-columns:1.2fr 1fr;gap:0;}
+.predict-code{margin:0;padding:16px 18px;background:var(--code-bg);color:#C7CEDA;font-family:var(--mono);font-size:12.5px;line-height:1.6;overflow-x:auto;}
+.predict-side{border-left:1px solid var(--line);padding:18px;display:flex;flex-direction:column;gap:10px;}
+.predict-q{font-family:var(--sans);font-size:14px;color:var(--heading);margin:0 0 4px;font-weight:500;}
+.predict-opts{display:flex;flex-direction:column;gap:8px;}
+.predict-opt{font-family:var(--mono);font-size:12.5px;text-align:left;padding:9px 12px;border-radius:7px;border:1px solid var(--line);background:#FFFFFF;cursor:pointer;white-space:pre-wrap;}
+.predict-opt:hover:not(:disabled){border-color:var(--practice);}
+.predict-opt:disabled{cursor:default;}
+.predict-opt.correct{border-color:var(--success);background:var(--success-soft);color:var(--success-text);font-weight:600;}
+.predict-opt.incorrect{border-color:var(--danger);background:var(--danger-soft);color:var(--danger-text);font-weight:600;}
+.predict-feedback{font-size:13.5px;padding:10px 12px;border-radius:7px;display:none;line-height:1.5;}
+.predict-feedback.show{display:block;}
+.predict-feedback.right{background:var(--success-soft);color:var(--success-text);}
+.predict-feedback.wrong{background:var(--danger-soft);color:var(--danger-text);}
+.predict-trace{align-self:flex-start;font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:6px;border:1px solid var(--sim-accent);color:var(--sim-accent);background:#FFFFFF;cursor:pointer;display:none;text-decoration:none;}
+.predict-trace.show{display:inline-block;}
+@media (max-width:700px){
+  .predict-body{grid-template-columns:1fr;}
+  .predict-side{border-left:none;border-top:1px solid var(--line);}
+}
+
+/* ---------- debugging lab ---------- */
+.debug-card{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);margin:18px 0 26px;}
+.debug-head{padding:10px 18px;background:var(--jump-soft);font-family:var(--mono);font-size:13px;color:#4B2FA0;border-bottom:1px solid var(--line);}
+.debug-body{padding:20px;}
+.debug-instructions{font-size:13.5px;color:var(--text-soft);margin:0 0 14px;}
+.debug-code{margin:0 0 14px;border-radius:8px;overflow:hidden;background:var(--code-bg);font-family:var(--mono);font-size:13px;line-height:1.7;padding:12px 0;}
+.debug-line{display:block;padding:2px 16px;color:#C7CEDA;cursor:pointer;border-left:3px solid transparent;}
+.debug-line:hover{background:rgba(165,67,47,.16);}
+.debug-line .ln{display:inline-block;width:20px;color:#5C6780;user-select:none;}
+.debug-line.picked{background:rgba(165,67,47,.24);border-left-color:var(--jump);}
+.debug-line.reveal-correct{background:rgba(30,158,124,.22);border-left-color:var(--success);}
+.debug-types{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px;}
+.debug-type-btn{font-family:var(--mono);font-size:12.5px;padding:7px 14px;border-radius:7px;border:1px solid var(--line);background:#FFFFFF;color:var(--text);cursor:pointer;}
+.debug-type-btn:hover:not(:disabled){border-color:var(--jump);}
+.debug-type-btn.correct{border-color:var(--success);background:var(--success-soft);color:var(--success-text);}
+.debug-type-btn.incorrect{border-color:var(--danger);background:var(--danger-soft);color:var(--danger-text);}
+.debug-feedback{font-size:13.5px;padding:10px 14px;border-radius:7px;margin:4px 0 4px;display:none;line-height:1.5;}
+.debug-feedback.show{display:block;}
+.debug-feedback.right{background:var(--success-soft);color:var(--success-text);}
+.debug-feedback.wrong{background:var(--danger-soft);color:var(--danger-text);}
+.debug-hintbox{font-size:13px;color:var(--text-soft);background:#F2EEE3;border:1px dashed var(--line);border-radius:7px;padding:9px 12px;margin-top:8px;display:none;}
+.debug-hintbox.show{display:block;}
+.debug-actions{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.debug-btn{font-family:var(--mono);font-size:12.5px;padding:7px 14px;border-radius:7px;border:1px solid var(--jump);background:#FFFFFF;color:var(--jump);cursor:pointer;}
+.debug-btn:hover:not(:disabled){background:var(--jump);color:#FFFFFF;}
+.debug-btn:disabled{opacity:.4;cursor:not-allowed;}
+.debug-fixed{margin-top:14px;border-radius:8px;overflow:hidden;display:none;}
+.debug-fixed.show{display:block;}
+.debug-fixed-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--success-text);background:var(--success-soft);padding:8px 16px;}
+.debug-fixed pre{margin:0;padding:14px 16px;background:var(--code-bg);color:#C7CEDA;font-family:var(--mono);font-size:13px;line-height:1.6;overflow-x:auto;}
+.debug-explain{margin-top:10px;font-size:13.5px;color:var(--text-soft);line-height:1.55;display:none;}
+.debug-explain.show{display:block;}
+
+/* ---------- live playground ---------- */
+.live-lab{border-color:var(--sim-accent);}
+.live-lab .sim-controls{flex-wrap:wrap;}
+.live-input-label{font-family:var(--mono);font-size:12.5px;color:var(--text-soft);}
+.live-input{font-family:var(--mono);font-size:13px;padding:6px 10px;border-radius:7px;border:1px solid var(--line);background:var(--code-bg);color:var(--text);width:64px;}
+select.live-input{width:auto;cursor:pointer;}
+.live-input:focus{outline:2px solid var(--sim-accent);outline-offset:1px;}
+.live-lab-body{padding:16px;}
+.live-lab-body .sim-output{font-family:var(--mono);}
+.live-hint{font-family:var(--mono);font-size:11.5px;color:var(--text-faint);margin-top:8px;}
+
+@media (max-width: 880px){
+  .sidebar{position:fixed;left:-300px;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));z-index:40;transition:left .2s;box-shadow:2px 0 24px rgba(0,0,0,.3);}
+  .sidebar.open{left:0;}
+  .nav-toggle{display:block;}
+  .hero{padding:80px 24px 36px;}
+  .content{padding:0 24px;}
+  footer{padding:40px 24px;}
+  .hero h1{font-size:32px;}
+  .debug-types{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div>
+    <p class="topbar-title">C++ Learning Lab</p>
+    <p class="topbar-sub">Class 11 · Tamil Nadu State Board · Unit III, Chapter 10 — Flow of Control</p>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-progress">
+      <span class="topbar-progress-text" data-role="progress-text">0 / 20 sections</span>
+      <span class="topbar-progress-track"><span class="topbar-progress-fill" data-role="progress-fill"></span></span>
+    </div>
+    <span class="topbar-lang">English</span>
+  </div>
+</header>
+
+<button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">≡</button>
+
+<div class="shell">
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">Unit III · Introduction to C++</div>
+    <div class="brand-title">Chapter 10<br>Flow of Control</div>
+
+    <div class="toc-group" data-fam="base">
+      <div class="toc-group-label">Foundations</div>
+      <ul>
+        <li><a href="#intro">10.1 Introduction</a></li>
+        <li><a href="#statements">10.2 Statements</a></li>
+        <li><a href="#control-statements">10.3 Control statements</a></li>
+      </ul>
+    </div>
+
+    <div class="toc-group" data-fam="selection">
+      <div class="toc-group-label">Selection Statements</div>
+      <ul>
+        <li><a href="#if-statement">10.4.1 if statement</a></li>
+        <li><a href="#nested-if">10.4.3 Nested if</a></li>
+        <li><a href="#if-else-ladder">10.4.4 if-else-if ladder</a></li>
+        <li><a href="#ternary">10.4.5 Conditional operator</a></li>
+        <li><a href="#switch">10.4.6 switch statement</a></li>
+        <li><a href="#switch-vs-ifelse">10.4.7 switch vs if-else</a></li>
+      </ul>
+    </div>
+
+    <div class="toc-group" data-fam="iteration">
+      <div class="toc-group-label">Iteration Statements</div>
+      <ul>
+        <li><a href="#iteration-intro">10.5 Iteration statements</a></li>
+        <li><a href="#for-loop">10.5.2 for loop</a></li>
+        <li><a href="#while-loop">10.5.3 while loop</a></li>
+        <li><a href="#do-while">10.5.4 do-while loop</a></li>
+        <li><a href="#nested-loops">10.5.5 Nested loops</a></li>
+      </ul>
+    </div>
+
+    <div class="toc-group" data-fam="jump">
+      <div class="toc-group-label">Jump Statements</div>
+      <ul>
+        <li><a href="#goto">10.6.1 goto statement</a></li>
+        <li><a href="#break">10.6.2 break statement</a></li>
+        <li><a href="#continue">10.6.3 continue statement</a></li>
+      </ul>
+    </div>
+
+    <div class="toc-group" data-fam="practice">
+      <div class="toc-group-label">Practice</div>
+      <ul>
+        <li><a href="#quiz-mcq">Quick Quiz</a></li>
+        <li><a href="#predict-output">Predict the Output</a></li>
+        <li><a href="#debug-lab">Debugging Lab</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="hero-eyebrow">Chapter 10 · C++ Programming Notes</div>
+      <h1>Flow of Control</h1>
+      <p class="lead">A reference on how C++ programs branch, repeat, and jump — covering selection statements (if, if-else, switch), iteration statements (for, while, do-while), and jump statements (goto, break, continue), with syntax, flowcharts, and worked programs.</p>
+      <div class="hero-tags">
+        <span class="tag tag-selection">Selection</span>
+        <span class="tag tag-iteration">Iteration</span>
+        <span class="tag tag-jump">Jump</span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- 10.1 -->
+      <section class="topic" id="intro">
+        <div class="kicker">10.1</div>
+        <h2 class="section-title">Introduction</h2>
+        <p>In the previous chapters you learnt the basic concepts of C++ programming such as variables, constants, operators, data types etc. Generally a program executes its statements sequentially from beginning to end. However, such a strict sequential ordering is restrictive and less useful. There are a lot of situations where it is useful to decide the code block executed on the basis of a certain condition.</p>
+        <p>In such situations, the flow of the code jumps from one part of the code to another segment of code. Program statements that cause such jumps are called <strong>control flow</strong>. This chapter deals with the basics of control structures such as <strong>Selection</strong>, <strong>Iteration</strong>, and <strong>Jump</strong> statement.</p>
+      </section>
+
+      <!-- 10.2 -->
+      <section class="topic" id="statements">
+        <div class="kicker">10.2</div>
+        <h2 class="section-title">Statements</h2>
+        <p>A computer program is a set of statements or instructions to perform a specific task. These statements are intended to perform specific action. The action may be of variable declarations, assignment operations, decision making, looping and so on.</p>
+        <p>There are two kinds of statements used in C++:</p>
+        <p>(i) Null statement &nbsp;&nbsp;(ii) Compound statement</p>
+
+        <h3 class="sub-title">10.2.1 Null statement</h3>
+        <p>The "null" or "empty statement" is a statement containing only a semicolon. It takes the following form:</p>
+        <div class="syntax-box">; // it is a null statement</div>
+        <p>Null statements are commonly used as placeholders in iteration statements or as statements on which to place labels at the end of compound statements or functions.</p>
+
+        <h3 class="sub-title">10.2.2 Compound (Block) statement</h3>
+        <p>C++ allows a group of statements enclosed by pair of braces {}. This group of statements is called a compound statement or a block. The general format of compound statement is:</p>
+        <div class="syntax-box">{
+    statement1;
+    statement2;
+    statement3;
+}</div>
+        <p>For example:</p>
+        <div class="syntax-box">{
+    int x, y;
+    x = 10;
+    y = x + 10;
+}</div>
+        <p>The compound statement or block is a treated as a single unit and may appear anywhere in the program.</p>
+      </section>
+
+      <!-- 10.3 -->
+      <section class="topic" id="control-statements">
+        <div class="kicker">10.3</div>
+        <h2 class="section-title">Control Statements</h2>
+        <p>Control statements are statements that alter the sequence of flow of instructions. In a program, statements may be executed sequentially, selectively, or iteratively. Every programming language provide statements to support sequence, selection (branching) and iteration.</p>
+        <p>If the statements are executed sequentially, the flow is called sequential flow. In some situations, if the statements alter the flow of execution like branching, iteration, jumping and function calls, this flow is called control flow.</p>
+
+        <h4 class="sub-sub-title">Sequence statement</h4>
+        <p>The <strong>sequential statement</strong> are the statements, that are executed one after another only once from top to bottom. These statements do not alter the flow of execution. These statements are called as sequential flow statements. They always end with a semicolon (;).</p>
+        <div class="flow-row">
+          <div class="flow-box">Statement 1</div><div class="flow-arrow">→</div>
+          <div class="flow-box">Statement 2</div><div class="flow-arrow">→</div>
+          <div class="flow-box">Statement 3</div>
+        </div>
+
+        <h4 class="sub-sub-title">Selection statement</h4>
+        <p>The selection statement means the statement (s) executed depend upon a condition. If a condition is true, a true block (a set of statements) is executed otherwise a false block is executed. This statement is also called <strong>decision statement</strong> or <strong>selection statement</strong> because it helps in making decision about which set of statements are to be executed.</p>
+
+        <h4 class="sub-sub-title">Iteration statement</h4>
+        <p>The <strong>iteration statement</strong> is a set of statement that are repetitively executed based upon a conditions. If a condition evaluates to true, the set of statements (true block) is executed again and again. As soon as the condition becomes false, the repetition stops. This is also known as <strong>looping statement</strong> or iteration statement. The set of statements that are executed again and again is called the <strong>body of the loop</strong>. The condition on which the execution or exit from the loop is decided is called <strong>exit-condition</strong> or <strong>test-condition</strong>.</p>
+        <p>Generally, all the programming languages support this type of statements to write programs depending upon the problem. C++ also supports this type of statements. These statements will be discussed in coming sections.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ============ SELECTION FAMILY ============ -->
+      <section class="topic family-selection" id="if-statement">
+        <div class="kicker">10.4 · Selection statements</div>
+        <h2 class="section-title">10.4.1 if statement</h2>
+        <p>In a program a decision causes a one time jump to a different part of a program. Decisions in C++ are made in several ways, most importantly with the <code>if</code> ... <code>else</code> ... statement which chooses between two alternatives. Another decision statement, <code>switch</code>, creates branches for multiple alternatives sections of code, depending on the value of a single variable.</p>
+        <p>The if statement evaluates a condition, if the condition is true then a true-block (a statement or set of statements) is executed, otherwise the true-block is skipped. The general syntax of the if statement is:</p>
+        <div class="syntax-box">if (expression)
+    true-block;
+statement-x;</div>
+        <p>In the above syntax, <code>if</code> is a keyword that should contain expression or condition which is enclosed within parentheses. If the expression is true (nonzero) then the true-block is executed and followed by statement-x are also executed, otherwise, the control passes to statement-x. The true-block may consists of a single statement, a compound statement or empty statement.</p>
+
+        <div class="note"><strong>Note —</strong> In C++, any non zero is treated as true including negative numbers and zero is treated as false.</div>
+
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.1 — check whether a person is eligible to vote</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main()
+{
+    int age;
+    cout&lt;&lt; "\n Enter your age: ";
+    cin&gt;&gt; age;
+    if(age&gt;=18)
+        cout&lt;&lt; "\n You are eligible for voting ....";
+    cout&lt;&lt; "This statement is always executed.";
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>Enter your age: 23
+You are eligible for voting….
+This statement is always executed.</div>
+        </div>
+        <div class="callout">The pair of braces is not required because if condition followed by only one statement.</div>
+
+        <div class="simulator" id="sim-if">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.1</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 7</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int age;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>cout &lt;&lt; "\n Enter your age: ";</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>cin &gt;&gt; age;   <span style="color:#8D97AC">// student types 23</span></span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>if(age&gt;=18)</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>    cout &lt;&lt; "\n You are eligible for voting ....";</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>cout &lt;&lt; "This statement is always executed.";</span>
+<span class="sim-line" data-line="7"><span class="ln">7</span>return 0;</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="simulator live-lab" id="live-if">
+          <div class="sim-header">
+            <span class="sim-title">Live playground — run it with your own age</span>
+            <div class="sim-controls">
+              <label class="live-input-label" for="live-if-age">age =</label>
+              <input type="number" id="live-if-age" class="live-input" value="23" min="0" max="130">
+              <button class="sim-btn primary" data-action="run-live-if">▶ Run</button>
+            </div>
+          </div>
+          <div class="live-lab-body">
+            <span class="sim-output-label">Console</span>
+            <div class="sim-output" id="live-if-output">Click Run to see the output for your value.</div>
+            <div class="live-hint">Try a value under 18, exactly 18, and a negative number — notice the third line always prints.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="topic family-selection" id="nested-if">
+        <div class="kicker">10.4.3</div>
+        <h2 class="section-title">Nested if</h2>
+        <p>An if statement which contains another if statement is called nested if. The nested if can have one of the following three forms.</p>
+        <p>1. If nested inside if part &nbsp;&nbsp; 2. If nested inside else part &nbsp;&nbsp; 3. If nested inside both if part and else part</p>
+
+        <div class="syntax-row">
+          <div class="syntax-box">// nested inside if part
+if (expression-1)
+{
+  if (expression-2)
+  {
+    True_Part_Statements;
+  }
+  else
+  {
+    False_Part_Statements;
+  }
+}
+else
+{
+  body of else part;
+}</div>
+          <div class="syntax-box">// nested inside else part
+if (expression-1)
+{
+  body of true part;
+}
+else
+{
+  if (expression-2)
+  {
+    True_Part_Statements;
+  }
+  else
+  {
+    False_Part_Statements;
+  }
+}</div>
+        </div>
+        <div class="syntax-box">// nested inside both if part and else part
+if (expression)
+{
+    if (expression)
+    {
+        True_Part_Statements;
+    }
+    else
+    {
+        False_Part_Statements;
+    }
+}
+else
+{
+    if (expression)
+    {
+        True_Part_Statements;
+    }
+    else
+    {
+        False_Part_Statements;
+    }
+}</div>
+        <p>In the first syntax of the nested if mentioned above the expression-1 is evaluated and the expression result is false then control passes to statement-m. Otherwise, expression-2 is evaluated,if the condition is true, then Nested-True block is executed, next statement-n is also executed. Otherwise Nested-False-Block, statement-n and statement-m are executed.</p>
+
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.3 — calculate commission according to grade using if..else</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main()
+{
+    int sales, commission;
+    char grade;
+    cout &lt;&lt; "\n Enter Sales amount: ";
+    cin &gt;&gt; sales;
+    cout &lt;&lt; "\n Enter Grade: ";
+    cin &gt;&gt; grade;
+    if (sales &gt; 5000)
+    {
+        commission = sales * 0.10;
+        cout &lt;&lt; "\n Commission: " &lt;&lt; commission;
+    }
+    else
+    {
+        commission = sales * 0.05;
+        cout &lt;&lt; "\n Commission: " &lt;&lt; commission;
+    }
+    cout &lt;&lt; "\n Good Job ..... ";
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>Enter Sales amount: 6000
+Enter Grade: A
+Commission: 600
+Good Job .....</div>
+        </div>
+
+        <div class="simulator" id="sim-nested-if">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.3</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 7</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int sales, commission; char grade;</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>cin &gt;&gt; sales;   <span style="color:#8D97AC">// 6000</span></span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>cin &gt;&gt; grade;   <span style="color:#8D97AC">// A</span></span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>if (sales &gt; 5000)</span>
+<span class="sim-line" data-line="7"><span class="ln">7</span>    commission = sales * 0.10;</span>
+<span class="sim-line" data-line="8"><span class="ln">8</span>    cout &lt;&lt; "\n Commission: " &lt;&lt; commission;</span>
+<span class="sim-line" data-line="15"><span class="ln">15</span>cout &lt;&lt; "\n Good Job ..... ";</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="topic family-selection" id="if-else-ladder">
+        <div class="kicker">10.4.4</div>
+        <h2 class="section-title">if-else-if ladder</h2>
+        <p>The if-else ladder is a multi-path decision making statement. In this type of statement 'if' is followed by one or more <strong>else if</strong> statements and finally end with an <strong>else</strong> statement.</p>
+        <div class="syntax-box">if (expression 1)
+{
+  Statement-1
+}
+else
+    if( expression 2)
+    {
+        Statement-2
+    }
+    else
+        if ( expression 3)
+        {
+            Statement-3
+        }
+        else
+        {
+            Statement-4
+        }</div>
+        <p>When the respective expression becomes true, the statement associated with block is executed, and the rest of the ladder is bypassed. If none of the conditions is true, then the final else statement will be executed.</p>
+
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.4 — find your grade using if-else ladder</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main ()
+{
+    int marks;
+    cout&lt;&lt;" Enter the Marks :";
+    cin&gt;&gt;marks;
+    if( marks &gt;= 60 )
+        cout&lt;&lt; "Your grade is 1st class !!" &lt;&lt;endl;
+    else if( marks &gt;= 50 &amp;&amp; marks &lt; 60 )
+        cout&lt;&lt; "your grade is 2nd class !!" &lt;&lt;endl;
+    else if( marks &gt;= 40 &amp;&amp; marks &lt; 50)
+        cout&lt;&lt; "your grade is 3rd class !!" &lt;&lt;endl;
+    else
+        cout&lt;&lt; "You are fail !!" &lt;&lt;endl;
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>Enter the Marks :60
+Your grade is 1st class !!</div>
+        </div>
+
+        <div class="simulator" id="sim-ladder">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.4</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 4</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>cin&gt;&gt;marks;   <span style="color:#8D97AC">// 60</span></span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>if( marks &gt;= 60 )</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    cout&lt;&lt; "Your grade is 1st class !!" &lt;&lt;endl;</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>else if( marks &gt;= 50 &amp;&amp; marks &lt; 60 ) ...</span>
+<span class="sim-line" data-line="9"><span class="ln">9</span>else ...</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <p>When the marks are greater than or equal to 60, the message "Your grade is 1st class !!" is displayed and the rest of the ladder is bypassed. When the marks are between 50 and 59, the message "Your grade is 2nd class !!" is displayed. When the mark between 40 to 49, the message "Your grade is 3rd class !!" is displayed, otherwise, the message "You are fail !!" is displayed.</p>
+      </section>
+
+      <section class="topic family-selection" id="ternary">
+        <div class="kicker">10.4.5</div>
+        <h2 class="section-title">The ?: Alternative to if-else</h2>
+        <p>The conditional operator (or Ternary operator) is an alternative for 'if else statement'. The conditional operator that consists of two symbols (?:). It takes three arguments. The control flow of conditional operator is shown below:</p>
+        <div class="syntax-box">expression 1 ? expression 2 : expression 3</div>
+        <p>In the above syntax, the expression 1 is a condition which is evaluated, if the condition is true (Non-zero), then the control is transferred to expression 2, otherwise, the control passes to expression 3.</p>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.5 — find greatest of two numbers using conditional operator</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main()
+{
+    int a, b, largest;
+    cout &lt;&lt; "\n Enter any two numbers: ";
+    cin &gt;&gt; a &gt;&gt; b;
+    largest = (a&gt;b)? a : b;
+    cout &lt;&lt; "\n Largest number : " &lt;&lt; largest;
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>Enter any two numbers: 12 98
+Largest number : 98</div>
+        </div>
+
+        <div class="simulator" id="sim-ternary">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.5</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 4</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int a, b, largest;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>cin &gt;&gt; a &gt;&gt; b;   <span style="color:#8D97AC">// 12 98</span></span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>largest = (a&gt;b)? a : b;</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>cout &lt;&lt; "\n Largest number : " &lt;&lt; largest;</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="topic family-selection" id="switch">
+        <div class="kicker">10.4.6</div>
+        <h2 class="section-title">switch statement</h2>
+        <p>The switch statement is a multi-way branch statement. It provides an easy way to dispatch execution to different parts of code based on the value of the expression. The switch statement replaces multiple if-else sequence.</p>
+        <div class="syntax-box">switch(expression)
+{
+    case constant 1:
+        statement(s);
+        break;
+    case constant 2:
+        statement(s);
+        break;
+    .
+    .
+    default:
+        statement(s);
+}</div>
+        <p>In the above syntax, the expression is evaluated and if its value matches against the constant value specified in one of the case statements, that respective set of statements are executed. Otherwise, the statements under the default option are executed.</p>
+
+
+        <p><strong>Rules:</strong></p>
+        <ol class="rules-list">
+          <li>The expression provided in the switch should result in a constant value otherwise it would not be valid.</li>
+          <li>Duplicate case values are not allowed.</li>
+          <li>The default statement is optional.</li>
+          <li>The break statement is used inside the switch to terminate a statement sequence. When a break statement is reached, the switch terminates, and the flow of control jumps to the next line following the switch statement.</li>
+          <li>The break statement is optional. If omitted, execution will continue into the next case. The flow of control will fall through subsequent cases until a break is reached.</li>
+          <li>Nesting of switch statements is also allowed.</li>
+        </ol>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.6 — demonstrate switch statement</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main()
+{
+    int num;
+    cout &lt;&lt; "\n Enter week day number: ";
+    cin &gt;&gt; num;
+    switch (num)
+    {
+        case 1 : cout &lt;&lt; "\n Sunday"; break;
+        case 2 : cout &lt;&lt; "\n Monday"; break;
+        case 3 : cout &lt;&lt; "\n Tuesday"; break;
+        case 4 : cout &lt;&lt; "\n Wednessday"; break;
+        case 5 : cout &lt;&lt; "\n Thursday"; break;
+        case 6 : cout &lt;&lt; "\n Friday"; break;
+        case 7 : cout &lt;&lt; "\n Saturday"; break;
+        default: cout &lt;&lt; "\n Wrong input....";
+    }
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>Enter week day number: 6
+Friday</div>
+        </div>
+
+        <div class="simulator" id="sim-switch">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.6</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 6</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>cin &gt;&gt; num;   <span style="color:#8D97AC">// student types 6</span></span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>switch (num)</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>{</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    case 5 : cout&lt;&lt;"\n Thursday"; break;</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>    case 6 : cout&lt;&lt;"\n Friday"; break;</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>    case 7 : cout&lt;&lt;"\n Saturday"; break;</span>
+<span class="sim-line" data-line="7"><span class="ln">7</span>    default: cout&lt;&lt;"\n Wrong input....";</span>
+<span class="sim-line" data-line="8"><span class="ln">8</span>}</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="topic family-selection" id="switch-vs-ifelse">
+        <div class="kicker">10.4.7</div>
+        <h2 class="section-title">switch vs if-else</h2>
+        <p>"if-else" and "switch" both are selection statements. The selection statements, transfer the flow of the program to the particular block of statements based upon whether the condition is "true" or "false". However, there are some differences between their operations. These are given below:</p>
+        <table class="cmp">
+          <tr><th>if-else</th><th>switch</th></tr>
+          <tr><td>Expression inside if statement decide whether to execute the if block or under else block.</td><td>expression inside switch statement decide which case to execute.</td></tr>
+          <tr><td>An if-else statement uses multiple statements for multiple choices</td><td>switch statement uses single expression for multiple choices.</td></tr>
+          <tr><td>If-else statement checks for equality as well as for logical expression.</td><td>switch statement checks only for equality.</td></tr>
+          <tr><td>The if statement evaluates integer, character, pointer or floating-point type or Boolean type.</td><td>switch statement evaluates only character or integer data type.</td></tr>
+          <tr><td>If the condition is false the else block statements will be executed</td><td>If the condition is false then the default statements are executed.</td></tr>
+        </table>
+        <p>The if statement is more flexible than switch statement.</p>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ============ ITERATION FAMILY ============ -->
+      <section class="topic family-iteration" id="iteration-intro">
+        <div class="kicker">10.5 · Iteration statements</div>
+        <h2 class="section-title">Iteration statements</h2>
+        <p>An iteration (or looping) is a sequence of one or more statements that are repeatedly executed until a condition is satisfied. These statements are also called control flow statements. It is used to control the length of code, to reduce time, to execute program and takes less memory space. C++ supports three types of iteration statements:</p>
+        <ul class="rules-list">
+          <li>for statement</li>
+          <li>while statement</li>
+          <li>do-while statement</li>
+        </ul>
+        <p>All looping statements repeat a set statements as long as a specified condition remains true. The specified condition is referred as a loop control. For all three loop statements, a true condition is any nonzero value and a zero value shows a false condition.</p>
+
+        <h3 class="sub-title">10.5.1 Parts of a loop</h3>
+        <p>Every loop has four elements that are used for different purposes. These elements are:</p>
+        <ul class="rules-list">
+          <li><strong>Initialization expression:</strong> the control variable(s) must be initialized before the control enters into loop. The initialization of the control variable takes place under the initialization expressions. The initialization expression is executed only once in the beginning of the loop.</li>
+          <li><strong>Test Expression:</strong> The test expression is an expression or condition whose value decides whether the loop-body will be executed or not. If the expression evaluates to true (i.e., 1), the body of the loop gets executed, otherwise the loop is terminated.</li>
+          <li><strong>Update expression:</strong> It is used to change the value of the loop variable. This statement is executed at the end of the loop after the body of the loop is executed.</li>
+          <li><strong>The body of the loop:</strong> A statement or set of statements forms a body of that loop that are executed repetitively.</li>
+        </ul>
+        <p>In an entry-controlled loop, the test-expression is evaluated before entering into a loop whereas in an exit-controlled loop, the test-expression is evaluated before exit from the loop.</p>
+      </section>
+
+      <section class="topic family-iteration" id="for-loop">
+        <div class="kicker">10.5.2</div>
+        <h2 class="section-title">for loop</h2>
+        <p>The for loop is a entry-controlled loop and the easiest looping statement which allows code to be executed repeatedly. It contains three different statements (initialization, condition or test-expression and update expression(s)) separated by semicolons. The general syntax is:</p>
+        <div class="syntax-box">for (initialization(s); test-expression; update expression(s))
+{
+    Statement 1;
+    Statement 2;
+    ............
+}
+Statement-x;</div>
+        <p>The initialization part is used to initialize variables or declare variable which are executed only once, then the control passes to test-expression. After evaluation of test-expression, if the result is false, the control transferred to statement-x. If the result is true, the body of the for loop is executed, next the control is transferred to update expression. After evaluation of update expression part, the control is transferred to the test-expression part. Next the steps 3 to 5 is repeated.</p>
+
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.7 — display numbers from 0 to 9</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main ()
+{
+    int i;
+    for(i = 0; i&lt; 10; i ++ )
+        cout&lt;&lt; "value of i : " &lt;&lt;i&lt;&lt;endl;
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>value of i : 0
+value of i : 1
+value of i : 2
+value of i : 3
+value of i : 4
+value of i : 5
+value of i : 6
+value of i : 7
+value of i : 8
+value of i : 9</div>
+        </div>
+
+        <div class="simulator" id="sim-count">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.7</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 23</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int i;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>for(i = 0; i&lt; 10; i++)</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>    cout&lt;&lt; "value of i : " &lt;&lt;i&lt;&lt;endl;</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <p>In the above program, first the variable i is initialized, next i is compared with 10, if i is less than ten, the value of i is incremented. In this way, the numbers 0 to 9 are displayed. Once i becomes 10, it is no longer &lt; 10. So, the control comes out of the for loop.</p>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.8 — sum the numbers from 1 to 10</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main ()
+{
+    int i,sum=0;
+    for(i=1; i&lt;=10;i++)
+    {
+        sum=sum+i;
+    }
+    cout&lt;&lt;"The sum of 1 to 10 is "&lt;&lt;sum;
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>The sum of 1 to 10 is 55</div>
+        </div>
+
+        <div class="simulator" id="sim-for">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.8</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 23</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int i, sum=0;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>for(i=1; i&lt;=10; i++)</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>{</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    sum = sum + i;</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>}</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>cout&lt;&lt;"The sum of 1 to 10 is "&lt;&lt;sum;</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="sub-sub-title">Variations of for loop</h4>
+        <p>The for is one of the most important looping statement in C++ because it allows several variations. These variations increase the flexibility and applicability of for loop.</p>
+
+        <h4 class="sub-sub-title">Multiple initialization and multiple update expressions</h4>
+        <p>Multiple statements can be used in the initialization and update expressions of for loop. These multiple initialization and multiple update expressions are separated by commas.</p>
+        <div class="illustration">
+          <div class="illustration-title">Multiple init / update expressions</div>
+          <pre><code class="language-cpp">#include&lt;iostream&gt;
+using namespace std;
+int main()
+{
+    int i, j;
+    for(i=0, j=10 ; i&lt;j ; i++,j--)
+    {
+        cout&lt;&lt;"\nThe value of i is"&lt;&lt;i&lt;&lt;" The value of j is "&lt;&lt;j;
+    }
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>The value of i is 0  The value of j is 10
+The value of i is 1  The value of j is 9
+The value of i is 2  The value of j is 8
+The value of i is 3  The value of j is 7
+The value of i is 4  The value of j is 6</div>
+        </div>
+
+        <div class="simulator" id="sim-multi-for">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through the multiple init / update example</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 16</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int i, j;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>for(i=0, j=10 ; i&lt;j ; i++,j--)</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>{</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    cout&lt;&lt;"\nThe value of i is"&lt;&lt;i&lt;&lt;" The value of j is "&lt;&lt;j;</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>}</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <p>In the above example, the initialization part contains two variables i and j and update expression contains i++ and j++. These two variables are separated by commas, during initialization firstly i=0 followed by j=10. Similarly in update expression, firstly i++ is evaluated followed by j++ is evaluated.</p>
+
+        <h4 class="sub-sub-title">Prefer prefix operator over postfix</h4>
+        <p>Generally, the update expression contains increment/decrement operator (++ or --). In this part, always prefer prefix increment/decrement over postfix when to be used alone. The reason behind this is that when used alone, prefix expressions are executed faster than postfix.</p>
+
+        <h4 class="sub-sub-title">Optional expressions</h4>
+        <p>Generally, the for loop contains three parts, i.e., initialization expressions, test expressions and update expressions. These three expressions are optional in a for loop.</p>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.9 — sum the numbers from 1 to n</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main ()
+{
+    int i, sum=0, n;
+    cout&lt;&lt;"\n Enter The value of n";
+    cin&gt;&gt;n;
+    i =1;
+    for ( ; i&lt;=n; )
+    {
+        sum += i;
+        ++i;
+    }
+    cout&lt;&lt;"\n The Sum of 1 to " &lt;&lt;n&lt;&lt;"is "&lt;&lt;sum;
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>Enter the value of n 5
+The sum of 1 to 5 is 15</div>
+        </div>
+
+        <div class="simulator live-lab" id="live-sum-n">
+          <div class="sim-header">
+            <span class="sim-title">Live playground — sum 1 to n</span>
+            <div class="sim-controls">
+              <label class="live-input-label" for="live-sum-n-input">n =</label>
+              <input type="number" id="live-sum-n-input" class="live-input" value="5" min="0" max="1000">
+              <button class="sim-btn primary" data-action="run-live-sum-n">▶ Run</button>
+            </div>
+          </div>
+          <div class="live-lab-body">
+            <span class="sim-output-label">Console</span>
+            <div class="sim-output" id="live-sum-n-output">Click Run to see the output for your value.</div>
+            <div class="live-hint">Try n = 0 and a larger n — notice the loop body never runs when n is 0.</div>
+          </div>
+        </div>
+
+        <p>In the above code, the update expression is not given, but a semicolon is necessary before the update expression. In the above code, neither the initialization nor the update expression is given in the for loop. If both or any one of expressions are absent then the control is transferred to conditional part.</p>
+
+        <h4 class="sub-sub-title">infinite loop</h4>
+        <p>An infinite loop will be formed if a test-expression is absent in a for loop. For example, test-expression is skipped:</p>
+        <div class="syntax-box">for( i=0 ;  ; ++i)
+    cout&lt;&lt;"\n Welcome"; // This statement is displayed infinitely</div>
+        <p>Similarly, the following for loop also forms an infinite loop. All three expressions are skipped:</p>
+        <div class="syntax-box">for(  ;  ;  )
+    cout&lt;&lt;"\n Welcome"; // This statement is displayed infinitely</div>
+
+        <h4 class="sub-sub-title">Empty loop</h4>
+        <p>Empty loop means a loop that has no statement in its body is called an empty loop. Following for loop is an empty loop:</p>
+        <div class="syntax-box">for( i=0  ;  i&lt;=5  ; +=i);  // The body of for loop contains a null statement</div>
+        <p>In the above code, the for loop contains a null statement, it is an empty loop. Similarly, the following for loop also forms an empty loop.</p>
+        <div class="syntax-box">int i;
+for( i=0  ;  i&lt;=5  ; ++i);  // The body of for loop is not executed because
+{                            // semicolon(;) is given at the end of for loop.
+    cout&lt;&lt;"\nWe are Indians";
+}</div>
+        <p>In the above code, the body of a for loop enclosed in braces is not executed because a semicolon is given after the for loop.</p>
+
+        <h4 class="sub-sub-title">Declaration of variable in a for loop</h4>
+        <p>In C++, the variables can also be declared within a for loop. For instance,</p>
+        <div class="syntax-box">int main ()
+{
+    int sum = 0;              // Variable (i) is declared within the for loop.
+    for(int i=0; i&lt;=5; ++i)
+    {
+        sum = sum + i;         // The variable i can be accessed only within the body of loop.
+    }
+    cout&lt;&lt;"\nThe variable i cannot be accessed here";
+    cout&lt;&lt;"\n The variable sum can be accessed here";
+}</div>
+        <p>A variable declared inside the block of main() can be accessed anywhere inside main() i.e., the scope of variable in main().</p>
+      </section>
+
+      <section class="topic family-iteration" id="while-loop">
+        <div class="kicker">10.5.3</div>
+        <h2 class="section-title">while loop</h2>
+        <p>A while loop is a control flow statement that allows the loop statements to be executed as long as the condition is true. The while loop is an entry-controlled loop because the test-expression is evaluated before entering into a loop. The while loop syntax is:</p>
+        <div class="syntax-box">while ( Test expression )
+{
+    Body of the loop;
+}
+Statement-x;</div>
+
+
+        <p>In while loop, the test expression is evaluated and if the test expression result is true, then the body of the loop is executed and again the control is transferred to the while loop. When the test expression result is false the control is transferred to statement-x.</p>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.10 — sum numbers from 1 to 10 using while loop</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main ()
+{
+    int i=1,sum=0;
+    while(i&lt;=10)
+    {
+        sum=sum+i;
+        i++;
+    }
+    cout&lt;&lt;"The sum of 1 to 10 is "&lt;&lt;sum;
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>The sum of 1 to 10 is 55</div>
+        </div>
+
+        <div class="simulator" id="sim-while">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.10</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 23</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int i=1, sum=0;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>while(i&lt;=10)</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>{</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    sum = sum + i;</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>    i++;</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>}</span>
+<span class="sim-line" data-line="7"><span class="ln">7</span>cout&lt;&lt;"The sum of 1 to 10 is "&lt;&lt;sum;</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <p>In the above program, the integer variable i is initialized to 1 and the variable sum to 0. The while loop checks the condition, i &lt;= 10, if the condition is true, the value of i, which is added to sum and i is incremented by 1. Again, the condition i &lt;= 10 is checked. Since 2 &lt;=10, 2 is added to the earlier value of sum. This continues until i becomes 11. At this point in time, 11 &lt;= 10 evaluates to false and the while loop terminates. After the loop termination, the value of sum is displayed.</p>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.11 — find sum and average of 5 numbers using while loop</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main ()
+{
+    int i=1,num,avg,sum=0;
+    while(i&lt;=5)
+    {
+        cout&lt;&lt;"Enter the number : ";
+        cin&gt;&gt;num;
+        sum=sum+num;
+        i++;
+    }
+    avg=sum/5;
+    cout&lt;&lt;"The Sum is "&lt;&lt;sum&lt;&lt;endl;
+    cout&lt;&lt;"The average is "&lt;&lt;avg;
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>Enter the number : 1
+Enter the number : 2
+Enter the number : 3
+Enter the number : 4
+Enter the number : 5
+The sum is 15</div>
+        </div>
+
+        <div class="simulator" id="sim-avg">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.11</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 41</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int i=1, num, avg, sum=0;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>while(i&lt;=5)</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>{</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    cout&lt;&lt;"Enter the number : ";</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>    cin&gt;&gt;num;</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>    sum=sum+num;</span>
+<span class="sim-line" data-line="7"><span class="ln">7</span>    i++;</span>
+<span class="sim-line" data-line="8"><span class="ln">8</span>}</span>
+<span class="sim-line" data-line="9"><span class="ln">9</span>avg=sum/5;</span>
+<span class="sim-line" data-line="10"><span class="ln">10</span>cout&lt;&lt;"The Sum is "&lt;&lt;sum&lt;&lt;endl;</span>
+<span class="sim-line" data-line="11"><span class="ln">11</span>cout&lt;&lt;"The average is "&lt;&lt;avg;</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="sub-sub-title">while loop variation</h4>
+        <p>A while loop may contain several variations. It can be an empty loop or an infinite loop. An empty while loop does not have any statement inside the body of the loop except null statement i.e., just a semicolon. For example:</p>
+        <div class="syntax-box">int main()
+{
+    int i=0;
+    while(++i &lt; 10000 ); // This is an empty loop because the while loop
+                          // does not contain any statement
+    return 0;
+}</div>
+        <p>In the above code, the loop is a time delay loop. A time delay loop is useful for pausing the program for some time.</p>
+        <p>A while loop may be infinite loop when no update statement is given inside the body of the loop. For example,</p>
+        <div class="syntax-box">int main()
+{
+    int i = 0;
+    while(i &lt; =10)
+        cout &lt;&lt;"The value of i is "&lt;&lt;i;   // This statement will be displayed infinitely
+    i++;                                    // because no update statement inside the
+    return 0;                               // body of the loop — not part of the while
+}                                            // statement, because of missing curly braces</div>
+      </section>
+
+      <section class="topic family-iteration" id="do-while">
+        <div class="kicker">10.5.4</div>
+        <h2 class="section-title">do-while loop</h2>
+        <p>The do-while loop is an exit-controlled loop. In do-while loop, the condition is evaluated at the bottom of the loop after executing the body of the loop. This means that the body of the loop is executed at least once, even when the condition evaluates false during the first iteration. The do-while loop syntax is:</p>
+        <div class="syntax-box">do
+{
+    Body of the loop;
+} while(condition);</div>
+
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.12 — display number from 10 to 1 using do-while loop</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main ()
+{
+    int n = 10;
+    do
+    {
+        cout&lt;&lt;n&lt;&lt;", ";
+        n--;
+    }while (n&gt;0) ;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>10, 9, 8, 7, 6, 5, 4, 3, 2, 1</div>
+        </div>
+
+        <div class="simulator" id="sim-dowhile">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.12</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 31</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int n = 10;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>do</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>{</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    cout&lt;&lt;n&lt;&lt;", ";</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>    n--;</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>}while (n&gt;0);</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <p>In the above program, the integer variable n is initialized to 10. Next the value displayed as 10 and n is decremented by 1. Now, the condition is evaluated, since 9 &gt; 0, again 9 is displayed and n is decremented to 8. This continues, until n becomes equal to 0, at which point, the condition n &gt; 0 will evaluate to false and the do-while loop terminates.</p>
+      </section>
+
+      <section class="topic family-iteration" id="nested-loops">
+        <div class="kicker">10.5.5</div>
+        <h2 class="section-title">Nesting of loops</h2>
+        <p>A loop which contains another loop is called a nested loop. The syntax is given below:</p>
+        <div class="syntax-box">for (initialization(s); test-expression; update expression(s))
+{
+    for (initialization(s); test-expression; update expression(s))
+    {
+        statement(s);
+    }
+    statement(s);
+}</div>
+        <div class="syntax-row">
+          <div class="syntax-box">while(condition)
+{
+    while(condition)
+    {
+        statement(s);
+    }
+    statement(s);
+}</div>
+          <div class="syntax-box">do
+{
+    statement(s);
+    do
+    {
+        statement(s);
+    }while(condition);
+} while( condition );</div>
+        </div>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.13 — display matrix multiplication table using nested for loop</div>
+          <pre><code class="language-cpp">#include&lt;iostream&gt;
+using namespace std;
+int main(void)
+{
+    cout&lt;&lt; "A multiplication table:" &lt;&lt;endl &lt;&lt; " 1\t2\t3\t4\t5\t6\t7\t8\t9" &lt;&lt;endl&lt;&lt;""&lt;&lt;endl;
+    for(int c = 1; c &lt; 10; c++)
+    {
+        cout&lt;&lt; c &lt;&lt; "| ";
+        for(int i = 1; i&lt; 10; i++)
+        {
+            cout&lt;&lt;i * c &lt;&lt; '\t';
+        }
+        cout&lt;&lt;endl;
+    }
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>A multiplication table:
+1  2  3  4  5  6  7  8  9
+
+1| 1  2  3  4  5  6  7  8  9
+2| 2  4  6  8 10 12 14 16 18
+3| 3  6  9 12 15 18 21 24 27
+4| 4  8 12 16 20 24 28 32 36
+5| 5 10 15 20 25 30 35 40 45
+6| 6 12 18 24 30 36 42 48 54
+7| 7 14 21 28 35 42 49 56 63
+8| 8 16 24 32 40 48 56 64 72
+9| 9 18 27 36 45 54 63 72 81</div>
+        </div>
+
+        <div class="simulator" id="sim-nested-loop">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through a 5×5 version of Illustration 10.13</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 71</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>for(int c = 1; c &lt; 6; c++)</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>{</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>    cout&lt;&lt; c &lt;&lt; "| ";</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    for(int i = 1; i&lt; 6; i++)</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>    {</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>        cout&lt;&lt;i * c &lt;&lt; '\t';</span>
+<span class="sim-line" data-line="7"><span class="ln">7</span>    }</span>
+<span class="sim-line" data-line="8"><span class="ln">8</span>    cout&lt;&lt;endl;</span>
+<span class="sim-line" data-line="9"><span class="ln">9</span>}</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="simulator live-lab" id="live-pattern">
+          <div class="sim-header">
+            <span class="sim-title">Live playground — build your own nested-loop pattern</span>
+            <div class="sim-controls">
+              <label class="live-input-label" for="live-pattern-rows">rows =</label>
+              <input type="number" id="live-pattern-rows" class="live-input" value="5" min="1" max="9">
+              <select id="live-pattern-type" class="live-input">
+                <option value="mult">i × c table</option>
+                <option value="stars">right triangle of *</option>
+                <option value="pyramid">centered pyramid</option>
+              </select>
+              <button class="sim-btn primary" data-action="run-live-pattern">▶ Run</button>
+            </div>
+          </div>
+          <div class="live-lab-body">
+            <span class="sim-output-label">Console</span>
+            <pre class="sim-output" id="live-pattern-output">Click Run to generate the pattern.</pre>
+            <div class="live-hint">Change the outer loop's limit (rows) and watch how the inner loop's work multiplies.</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ============ JUMP FAMILY ============ -->
+      <section class="topic family-jump" id="goto">
+        <div class="kicker">10.6 · Jump statements</div>
+        <h2 class="section-title">10.6.1 goto statement</h2>
+        <p>Jump statements are used to interrupt the normal flow of program. Types of Jump Statements are:</p>
+        <ul class="rules-list">
+          <li>goto statement</li>
+          <li>break statement</li>
+          <li>continue statement</li>
+        </ul>
+        <p>The goto statement is a control statement which is used to transfer the control from one place to another place without any condition in a program. The syntax of the goto statement is:</p>
+        <div class="syntax-row">
+          <div class="syntax-box">// Syntax 1
+goto label;
+---------------
+---------------
+---------------
+label:</div>
+          <div class="syntax-box">// Syntax 2
+label:
+---------------
+---------------
+---------------
+goto label;</div>
+        </div>
+
+        <div class="flow-row">
+          <div class="flow-box">goto label;</div><div class="flow-arrow">⇢</div>
+          <div class="flow-box">label:</div>
+          <span style="font-family:var(--mono);font-size:12px;color:var(--text-faint);margin-left:12px;">forward jump</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-box">label:</div><div class="flow-arrow">⇠</div>
+          <div class="flow-box">goto label;</div>
+          <span style="font-family:var(--mono);font-size:12px;color:var(--text-faint);margin-left:12px;">backward jump</span>
+        </div>
+        <p>In the syntax above, label is an identifier. When goto label; is encountered, the control of program jumps to label: and executes the code below it.</p>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.14 — display the first five odd numbers using goto</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main()
+{
+    int n=1;
+    jump:
+    {
+        if(n&lt;10)
+        {  // Control of the program moves to jump:
+            cout&lt;&lt;n&lt;&lt;'\t';
+            n+=2;
+            goto jump;
+        }
+        else
+            return 0;
+    }
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>1  3  5  7  9</div>
+        </div>
+        <p>In the above program the first five odd numbers are displayed. If n is less than 10 goto transfers the control to jump statement. If n is greater than 10 the control comes out of the loop.</p>
+
+        <div class="simulator" id="sim-goto">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.14</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 21</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int n=1;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>jump:</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>if(n&lt;10)</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>{</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>    cout&lt;&lt;n&lt;&lt;'\t';</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>    n+=2;</span>
+<span class="sim-line" data-line="7"><span class="ln">7</span>    goto jump;</span>
+<span class="sim-line" data-line="8"><span class="ln">8</span>}</span>
+<span class="sim-line" data-line="10"><span class="ln">10</span>else return 0;</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="topic family-jump" id="break">
+        <div class="kicker">10.6.2</div>
+        <h2 class="section-title">break statement</h2>
+        <p>A break statement is a jump statement which terminates the execution of loop and control is transferred to resume normal execution after the body of the loop. The break statement works the same way inside a <code>for</code>, <code>while</code>, or <code>do-while</code> loop — as soon as it is reached, the loop ends immediately and control passes to the statement right after the loop.</p>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.15 — count N numbers using break statement</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main ()
+{
+    int count = 1;
+    do
+    {
+        cout&lt;&lt; "Count : " &lt;&lt; count &lt;&lt;endl;
+        if( count &gt;= 3)
+        {
+            break;
+        }
+        count ++;
+    }while( count &lt; 20 );
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>Count : 1
+Count : 2
+Count : 3</div>
+        </div>
+
+        <div class="simulator" id="sim-break">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.15</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 11</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>int count = 1;</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>do</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>{</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    cout&lt;&lt; "Count : " &lt;&lt; count &lt;&lt;endl;</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>    if( count &gt;= 3)</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>    {</span>
+<span class="sim-line" data-line="7"><span class="ln">7</span>        break;</span>
+<span class="sim-line" data-line="8"><span class="ln">8</span>    }</span>
+<span class="sim-line" data-line="9"><span class="ln">9</span>    count ++;</span>
+<span class="sim-line" data-line="10"><span class="ln">10</span>}while( count &lt; 20 );</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <p>In the above example, the while loop will iterate for 20 times, but as soon as the count reaches 3, the loop is terminated, because of the break statement.</p>
+      </section>
+
+      <section class="topic family-jump" id="continue">
+        <div class="kicker">10.6.3</div>
+        <h2 class="section-title">continue statement</h2>
+        <p>The continue statement works quite similar to the break statement. Instead of terminating the loop (break statement), continue statement forces the loop to continue or execute the next iteration. When the continue statement is executed in the loop, the code inside the loop following the continue statement will be skipped and next iteration of the loop will begin.</p>
+
+        <div class="illustration">
+          <div class="illustration-title">Illustration 10.16 — display numbers from 1 to 10 except 6 using continue</div>
+          <pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+int main()
+{
+    for (int i = 1; i&lt;= 10; i++) {
+        if (i == 6)
+            continue;
+        else
+            cout&lt;&lt;i&lt;&lt;" ";
+    }
+    return 0;
+}</code></pre>
+          <div class="output-block"><span class="output-label">Output</span>1 2 3 4 5 7 8 9 10</div>
+        </div>
+
+        <div class="simulator" id="sim-continue">
+          <div class="sim-header">
+            <span class="sim-title">Try it — step through Illustration 10.16</span>
+            <div class="sim-controls">
+              <button class="sim-btn" data-action="reset">Reset</button>
+              <button class="sim-btn" data-action="step">Step ▸</button>
+              <button class="sim-btn primary" data-action="play">▶ Play</button>
+              <span class="sim-step-label" data-role="label">Step 0 / 31</span>
+            </div>
+          </div>
+          <div class="sim-body">
+            <pre class="sim-code"><span class="sim-line" data-line="1"><span class="ln">1</span>for (int i = 1; i&lt;= 10; i++) {</span>
+<span class="sim-line" data-line="2"><span class="ln">2</span>    if (i == 6)</span>
+<span class="sim-line" data-line="3"><span class="ln">3</span>        continue;</span>
+<span class="sim-line" data-line="4"><span class="ln">4</span>    else</span>
+<span class="sim-line" data-line="5"><span class="ln">5</span>        cout&lt;&lt;i&lt;&lt;" ";</span>
+<span class="sim-line" data-line="6"><span class="ln">6</span>}</span></pre>
+            <div class="sim-side">
+              <div class="sim-vars" data-role="vars"></div>
+              <div class="sim-output-wrap"><span class="sim-output-label">Console</span><div class="sim-output" data-role="output"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <p>In the above example, the loop will iterate 10 times but, if i reaches 6, then the control is transferred to for loop, because of the continue statement.</p>
+
+        <h4 class="sub-sub-title">Difference between break and continue</h4>
+        <table class="cmp">
+          <tr><th>Break</th><th>Continue</th></tr>
+          <tr><td>Break is used to <strong>terminate</strong> the execution of the loop.</td><td>Continue is not used to terminate the execution of loop.</td></tr>
+          <tr><td>It breaks the iteration.</td><td>It skips the iteration.</td></tr>
+          <tr><td>When this statement is executed, control will come out from the loop and executes the statement immediate after loop.</td><td>When this statement is executed, it will not come out of the loop but moves/jumps to the next iteration of loop.</td></tr>
+          <tr><td>Break is used with loops as well as switch case.</td><td>Continue is only used in loops, it is not used in switch case.</td></tr>
+        </table>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ============ PRACTICE FAMILY ============ -->
+      <section class="topic family-practice" id="quiz-mcq">
+        <div class="kicker">Practice · Quick Quiz</div>
+        <h2 class="section-title">Quick Quiz</h2>
+        <p>Twelve questions covering selection, iteration, and jump statements. Pick an answer for instant feedback — your score is tracked as you go.</p>
+        <div class="quiz-box" id="quiz-flow"></div>
+      </section>
+
+      <section class="topic family-practice" id="predict-output">
+        <div class="kicker">Practice · Predict the Output</div>
+        <h2 class="section-title">Predict the Output</h2>
+        <p>Read each program carefully — some of these hide a classic beginner trap you've already seen above (like a stray semicolon, a missing break, or a missing update expression). Choose what you think the program prints, then use "Trace the program" to re-run it step by step in the matching simulator.</p>
+        <div id="predict-flow"></div>
+      </section>
+
+      <section class="topic family-practice" id="debug-lab">
+        <div class="kicker">Practice · Debugging Lab</div>
+        <h2 class="section-title">Debugging Lab</h2>
+        <p>Each program below runs, but not the way it's supposed to. Click the line you think is wrong, then classify the mistake as a <strong>syntax error</strong> (breaks the language rules), a <strong>logical error</strong> (compiles and runs, but gives the wrong result), or a <strong>runtime error</strong> (fails or misbehaves while running). Use a hint if you get stuck, then reveal the fix.</p>
+        <div id="debug-flow"></div>
+      </section>
+
+    </div>
+
+    <footer>Chapter 10 · Flow of Control — Unit III, Introduction to C++ · compiled as a single-page reference</footer>
+  </main>
+</div>
+
+<script>
+hljs.highlightAll();
+
+const toggle = document.getElementById('navToggle');
+const sidebar = document.getElementById('sidebar');
+toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+document.querySelectorAll('.sidebar a').forEach(a => {
+  a.addEventListener('click', () => sidebar.classList.remove('open'));
+});
+
+function initSimulator(id, trace, varNames){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const codeEl = el.querySelector('.sim-code');
+  const varsEl = el.querySelector('[data-role="vars"]');
+  const outEl = el.querySelector('[data-role="output"]');
+  const labelEl = el.querySelector('[data-role="label"]');
+  const stepBtn = el.querySelector('[data-action="step"]');
+  const playBtn = el.querySelector('[data-action="play"]');
+  const resetBtn = el.querySelector('[data-action="reset"]');
+  let idx = -1, playing = false, timer = null;
+
+  function stopPlay(){
+    playing = false;
+    clearInterval(timer);
+    playBtn.textContent = '▶ Play';
+  }
+  function render(){
+    codeEl.querySelectorAll('.sim-line').forEach(s => s.classList.remove('active-line'));
+    if(idx >= 0){
+      const step = trace[idx];
+      const line = codeEl.querySelector('.sim-line[data-line="'+step.line+'"]');
+      if(line) line.classList.add('active-line');
+      varsEl.innerHTML = varNames.map(n => {
+        const v = step.vars[n];
+        if(v === undefined) return '';
+        return '<div class="sim-var"><span class="sim-var-name">'+n+'</span><span class="sim-var-val">'+v+'</span></div>';
+      }).join('');
+      let out = '';
+      for(let i = 0; i <= idx; i++){ if(trace[i].out) out += trace[i].out; }
+      outEl.textContent = out;
+      labelEl.textContent = 'Step ' + (idx+1) + ' / ' + trace.length;
+    } else {
+      varsEl.innerHTML = '<span class="sim-hint">Press Step or Play to begin</span>';
+      outEl.textContent = '';
+      labelEl.textContent = 'Step 0 / ' + trace.length;
+    }
+    stepBtn.disabled = idx >= trace.length - 1;
+  }
+  function advance(){
+    if(idx < trace.length - 1){ idx++; render(); }
+    else { stopPlay(); }
+  }
+  stepBtn.addEventListener('click', advance);
+  resetBtn.addEventListener('click', () => { idx = -1; stopPlay(); render(); });
+  playBtn.addEventListener('click', () => {
+    if(playing){ stopPlay(); return; }
+    if(idx >= trace.length - 1) idx = -1;
+    playing = true;
+    playBtn.textContent = '‖ Pause';
+    timer = setInterval(advance, 650);
+  });
+  render();
+}
+
+/* ---- trace data ---- */
+initSimulator('sim-if', [
+  {line:1, vars:{age:'—'}},
+  {line:2, vars:{age:'—'}, out:'\nEnter your age: '},
+  {line:3, vars:{age:23}},
+  {line:4, vars:{age:23}},
+  {line:5, vars:{age:23}, out:'\nYou are eligible for voting ....'},
+  {line:6, vars:{age:23}, out:'\nThis statement is always executed.'},
+  {line:7, vars:{age:23}},
+], ['age']);
+
+initSimulator('sim-count', (function(){
+  const t = [{line:1, vars:{i:'—'}}];
+  for(let i=0;i<10;i++){
+    t.push({line:2, vars:{i:i}});
+    t.push({line:3, vars:{i:i}, out:'value of i : '+i+'\n'});
+  }
+  t.push({line:2, vars:{i:10}});
+  return t;
+})(), ['i']);
+
+initSimulator('sim-multi-for', (function(){
+  const t = [{line:1, vars:{i:'—',j:'—'}}];
+  for(let i=0,j=10; i<j; i++,j--){
+    t.push({line:2, vars:{i:i,j:j}});
+    t.push({line:4, vars:{i:i,j:j}, out:'\nThe value of i is'+i+' The value of j is '+j});
+  }
+  t.push({line:2, vars:{i:5,j:5}});
+  return t;
+})(), ['i','j']);
+
+initSimulator('sim-for', (function(){
+  const t = [{line:1, vars:{i:'—',sum:0}}];
+  let sum = 0;
+  for(let i=1;i<=10;i++){
+    t.push({line:2, vars:{i:i,sum:sum}});
+    sum += i;
+    t.push({line:4, vars:{i:i,sum:sum}});
+  }
+  t.push({line:2, vars:{i:11,sum:sum}});
+  t.push({line:6, vars:{i:11,sum:sum}, out:'The sum of 1 to 10 is '+sum});
+  return t;
+})(), ['i','sum']);
+
+initSimulator('sim-while', (function(){
+  const t = [{line:1, vars:{i:1,sum:0}}];
+  let i=1, sum=0;
+  while(i<=10){
+    t.push({line:2, vars:{i:i,sum:sum}});
+    sum = sum + i;
+    t.push({line:4, vars:{i:i,sum:sum}});
+    i++;
+    t.push({line:5, vars:{i:i,sum:sum}});
+  }
+  t.push({line:2, vars:{i:i,sum:sum}});
+  t.push({line:7, vars:{i:i,sum:sum}, out:'The sum of 1 to 10 is '+sum});
+  return t;
+})(), ['i','sum']);
+
+initSimulator('sim-avg', (function(){
+  const t = [{line:1, vars:{i:1,num:'—',avg:'—',sum:0}}];
+  let sum = 0, num;
+  const inputs = [1,2,3,4,5];
+  for(let i=1;i<=5;i++){
+    t.push({line:2, vars:{i:i,num:num,avg:'—',sum:sum}});
+    t.push({line:4, vars:{i:i,num:num,avg:'—',sum:sum}, out:'Enter the number : '});
+    num = inputs[i-1];
+    t.push({line:5, vars:{i:i,num:num,avg:'—',sum:sum}});
+    sum = sum + num;
+    t.push({line:6, vars:{i:i,num:num,avg:'—',sum:sum}});
+    t.push({line:7, vars:{i:i+1,num:num,avg:'—',sum:sum}});
+  }
+  t.push({line:2, vars:{i:6,num:num,avg:'—',sum:sum}});
+  const avg = Math.trunc(sum/5);
+  t.push({line:9, vars:{i:6,num:num,avg:avg,sum:sum}});
+  t.push({line:10, vars:{i:6,num:num,avg:avg,sum:sum}, out:'\nThe Sum is '+sum});
+  t.push({line:11, vars:{i:6,num:num,avg:avg,sum:sum}, out:'\nThe average is '+avg});
+  return t;
+})(), ['i','num','sum','avg']);
+
+initSimulator('sim-dowhile', (function(){
+  const t = [{line:1, vars:{n:10}}];
+  let n = 10;
+  do{
+    t.push({line:4, vars:{n:n}, out:n+', '});
+    n--;
+    t.push({line:5, vars:{n:n}});
+    t.push({line:6, vars:{n:n}});
+  } while(n>0);
+  return t;
+})(), ['n']);
+
+initSimulator('sim-switch', [
+  {line:1, vars:{num:6}},
+  {line:2, vars:{num:6}},
+  {line:3, vars:{num:6}},
+  {line:5, vars:{num:6}, out:'\nFriday'},
+  {line:8, vars:{num:6}},
+], ['num']);
+
+initSimulator('sim-break', (function(){
+  const t = [{line:1, vars:{count:1}}];
+  let count = 1;
+  while(true){
+    t.push({line:4, vars:{count:count}, out:'Count : '+count+'\n'});
+    if(count >= 3){
+      t.push({line:5, vars:{count:count}});
+      t.push({line:7, vars:{count:count}});
+      break;
+    }
+    t.push({line:5, vars:{count:count}});
+    count++;
+    t.push({line:9, vars:{count:count}});
+    t.push({line:10, vars:{count:count}});
+  }
+  return t;
+})(), ['count']);
+
+initSimulator('sim-continue', (function(){
+  const t = [];
+  for(let i=1;i<=10;i++){
+    t.push({line:1, vars:{i:i}});
+    t.push({line:2, vars:{i:i}});
+    if(i===6){
+      t.push({line:3, vars:{i:i}});
+    } else {
+      t.push({line:5, vars:{i:i}, out:i+' '});
+    }
+  }
+  t.push({line:1, vars:{i:11}});
+  return t;
+})(), ['i']);
+
+initSimulator('sim-nested-if', [
+  {line:1, vars:{sales:'—',grade:'—',commission:'—'}},
+  {line:3, vars:{sales:6000,grade:'—',commission:'—'}},
+  {line:4, vars:{sales:6000,grade:'A',commission:'—'}},
+  {line:5, vars:{sales:6000,grade:'A',commission:'—'}},
+  {line:7, vars:{sales:6000,grade:'A',commission:600}},
+  {line:8, vars:{sales:6000,grade:'A',commission:600}, out:'\nCommission: 600'},
+  {line:15, vars:{sales:6000,grade:'A',commission:600}, out:'\nGood Job ..... '},
+], ['sales','grade','commission']);
+
+initSimulator('sim-ladder', [
+  {line:1, vars:{marks:'—'}},
+  {line:3, vars:{marks:60}},
+  {line:4, vars:{marks:60}, out:'Your grade is 1st class !!\n'},
+], ['marks']);
+
+initSimulator('sim-ternary', [
+  {line:1, vars:{a:'—',b:'—',largest:'—'}},
+  {line:2, vars:{a:12,b:98,largest:'—'}},
+  {line:3, vars:{a:12,b:98,largest:98}},
+  {line:4, vars:{a:12,b:98,largest:98}, out:'\nLargest number : 98'},
+], ['a','b','largest']);
+
+initSimulator('sim-goto', (function(){
+  const t = [{line:1, vars:{n:1}}];
+  let n = 1;
+  while(n < 10){
+    t.push({line:3, vars:{n:n}});
+    t.push({line:5, vars:{n:n}, out:n+'\t'});
+    n += 2;
+    t.push({line:6, vars:{n:n}});
+    t.push({line:7, vars:{n:n}});
+  }
+  t.push({line:3, vars:{n:n}});
+  t.push({line:10, vars:{n:n}});
+  return t;
+})(), ['n']);
+
+initSimulator('sim-nested-loop', (function(){
+  const t = [];
+  for(let c=1;c<=5;c++){
+    t.push({line:1, vars:{c:c,i:'—'}});
+    t.push({line:3, vars:{c:c,i:'—'}, out:c+'| '});
+    let row = '';
+    for(let i=1;i<=5;i++){
+      t.push({line:4, vars:{c:c,i:i}});
+      row += (i*c)+'\t';
+      t.push({line:6, vars:{c:c,i:i}, out:(i*c)+'\t'});
+    }
+    t.push({line:4, vars:{c:c,i:6}});
+    t.push({line:8, vars:{c:c,i:6}, out:'\n'});
+  }
+  t.push({line:1, vars:{c:6,i:'—'}});
+  return t;
+})(), ['c','i']);
+
+/* ============================================================
+   QUICK QUIZ
+   ============================================================ */
+function initQuiz(id, questions){
+  const root = document.getElementById(id);
+  if(!root) return;
+  let i = 0, score = 0, answered = false;
+
+  function renderQuestion(){
+    answered = false;
+    const q = questions[i];
+    root.innerHTML =
+      '<div class="quiz-top">'+
+        '<span class="quiz-count">Q '+(i+1)+' / '+questions.length+'</span>'+
+        '<div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:'+(i/questions.length*100)+'%"></div></div>'+
+        '<span class="quiz-score-live">Score: '+score+'</span>'+
+      '</div>'+
+      '<div class="quiz-body">'+
+        '<p class="quiz-q">'+q.q+'</p>'+
+        '<div class="quiz-opts">'+
+          q.options.map((opt,oi) => '<button class="quiz-opt" data-oi="'+oi+'">'+opt+'</button>').join('')+
+        '</div>'+
+        '<div class="quiz-feedback" data-role="fb"></div>'+
+      '</div>'+
+      '<div class="quiz-bottom"><button class="quiz-next" data-role="next" disabled>'+(i === questions.length-1 ? 'See score' : 'Next question')+' →</button></div>';
+
+    root.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if(answered) return;
+        answered = true;
+        const oi = Number(btn.dataset.oi);
+        const correct = oi === q.correct;
+        if(correct) score++;
+        root.querySelectorAll('.quiz-opt').forEach((b,bi) => {
+          b.disabled = true;
+          if(bi === q.correct) b.classList.add('correct');
+          else if(bi === oi) b.classList.add('incorrect');
+        });
+        const fb = root.querySelector('[data-role="fb"]');
+        fb.className = 'quiz-feedback show ' + (correct ? 'right' : 'wrong');
+        fb.innerHTML = '<strong>'+(correct ? (q.cf || "That's right!") : (q.incf || 'Not quite.'))+'</strong>'+q.explain;
+        root.querySelector('[data-role="next"]').disabled = false;
+      });
+    });
+
+    root.querySelector('[data-role="next"]').addEventListener('click', () => {
+      if(i < questions.length - 1){ i++; renderQuestion(); }
+      else { renderScore(); }
+    });
+  }
+
+  function renderScore(){
+    root.innerHTML =
+      '<div class="quiz-score">'+
+        '<div class="big">'+score+' / '+questions.length+'</div>'+
+        '<p>'+(score === questions.length ? 'Perfect score — you have flow of control down.' : score >= questions.length*0.7 ? "Good work — look back at the ones you missed." : "Worth another pass — re-read the sections above and try again.")+'</p>'+
+        '<button class="quiz-restart" data-role="restart">↺ Restart quiz</button>'+
+      '</div>';
+    root.querySelector('[data-role="restart"]').addEventListener('click', () => { i = 0; score = 0; renderQuestion(); });
+  }
+
+  renderQuestion();
+}
+
+const QUIZ_DATA = [
+  {
+    q: 'What exactly is a "null statement" in C++?',
+    options: ['A statement containing only a semicolon ( ; )', 'A statement that declares no variables', 'A function that returns nothing', 'A comment that the compiler ignores'],
+    correct: 0,
+    cf: 'Right —', incf: 'Not quite —',
+    explain: ' The null (empty) statement is just a lone semicolon. It\'s used as a placeholder in loops, or as something to attach a label to.'
+  },
+  {
+    q: 'In <code>if(age &gt;= 18)</code>, which value would make the condition treated as <strong>false</strong>?',
+    options: ['-5', '0', '1', 'Any non-zero number'],
+    correct: 1,
+    cf: 'Exactly —', incf: 'Not quite —',
+    explain: ' In C++, zero is treated as false and any non-zero value — including negative numbers — is treated as true.'
+  },
+  {
+    q: 'According to the textbook, the true-block of an <code>if</code> statement can be:',
+    options: ['Only a single statement', 'A single statement, a compound statement, or an empty statement', 'Only a compound statement in braces', 'Only another if statement'],
+    correct: 1,
+    cf: 'Correct —', incf: 'Not quite —',
+    explain: ' The true-block may be a single statement, a compound (block) statement, or even an empty statement — which is exactly what makes the stray-semicolon mistake possible.'
+  },
+  {
+    q: 'Which best describes what a <code>switch</code> statement does?',
+    options: ['Repeats a block until a condition is false', 'A multi-way branch that dispatches execution based on the value of an expression', 'Terminates the current loop immediately', 'Jumps unconditionally to a label'],
+    correct: 1,
+    cf: 'That\'s it —', incf: 'Not quite —',
+    explain: ' switch is a multi-way branch: it compares one expression against several constant case values and replaces a long if-else sequence.'
+  },
+  {
+    q: 'Which rule about <code>switch</code> is correct?',
+    options: ['Duplicate case values are allowed if they use different data types', 'Duplicate case values are not allowed', 'The default label is compulsory', 'Nesting switch statements is not allowed'],
+    correct: 1,
+    cf: 'Right —', incf: 'Not quite —',
+    explain: ' Duplicate case values are never allowed in the same switch. The default label is optional, and switch statements can be nested.'
+  },
+  {
+    q: 'If a <code>case</code> in a switch has no <code>break</code>, what happens?',
+    options: ['The switch stops immediately with an error', 'Execution falls through and continues into the next case, until a break is reached', 'That case is simply skipped', 'C++ automatically inserts a break at compile time'],
+    correct: 1,
+    cf: 'Correct —', incf: 'Not quite —',
+    explain: ' Without break, control falls through into the next case\'s statements and keeps going until it hits a break (or the end of the switch).'
+  },
+  {
+    q: 'Why is the <code>while</code> loop called an "entry-controlled" loop?',
+    options: ['Because it can only run once', 'Because the test-expression is evaluated before the body ever runs', 'Because it needs a special entry() function', 'Because the loop body must contain an entry statement'],
+    correct: 1,
+    cf: 'Exactly —', incf: 'Not quite —',
+    explain: ' In a while loop the condition is checked first — before entering the loop body — so the body may never execute at all if the condition starts false.'
+  },
+  {
+    q: 'What makes a <code>do-while</code> loop different from a <code>while</code> loop?',
+    options: ['do-while can never be infinite', 'do-while always executes its body at least once, because the condition is checked at the bottom', 'do-while does not need a semicolon', 'do-while cannot contain more than one statement'],
+    correct: 1,
+    cf: 'Right —', incf: 'Not quite —',
+    explain: ' do-while is exit-controlled: the body runs first, and the condition is checked only afterwards — so the body always executes at least once.'
+  },
+  {
+    q: 'In <code>for( ; i&lt;=n ; )</code>, what happens because the initialization and update parts are left empty?',
+    options: ['It is a syntax error', 'Control simply moves to whichever part is present — here, straight to the test-expression', 'The loop becomes an infinite loop automatically', 'i is set to 0 by default'],
+    correct: 1,
+    cf: 'Correct —', incf: 'Not quite —',
+    explain: ' All three parts of a for loop are optional. If an expression is missing, control just moves on to whichever part is present next — the semicolons still have to stay.'
+  },
+  {
+    q: 'What does <code>for( ; ; )</code> produce?',
+    options: ['A compile-time error', 'An empty loop that never runs', 'An infinite loop, because the test-expression is absent', 'A loop that runs exactly once'],
+    correct: 2,
+    cf: 'Exactly —', incf: 'Not quite —',
+    explain: ' With no test-expression, there\'s nothing to ever make the loop stop, so it repeats forever — a classic infinite loop.'
+  },
+  {
+    q: 'What does the <code>break</code> statement do inside a loop?',
+    options: ['Skips the current iteration only, then continues looping', 'Terminates the loop completely and passes control to the statement right after it', 'Pauses the loop until a key is pressed', 'Restarts the loop from the beginning'],
+    correct: 1,
+    cf: 'Right —', incf: 'Not quite —',
+    explain: ' break ends the loop entirely — execution resumes at the first statement after the loop body, no matter how many iterations were left.'
+  },
+  {
+    q: 'What does the <code>continue</code> statement do inside a loop?',
+    options: ['It terminates the loop, like break', 'It skips the rest of the current iteration and jumps to the next one', 'It only works inside a switch statement', 'It exits the entire program'],
+    correct: 1,
+    cf: 'Correct —', incf: 'Not quite —',
+    explain: ' continue skips whatever code comes after it in that iteration and jumps straight to the next iteration — unlike break, the loop itself keeps going.'
+  }
+];
+initQuiz('quiz-flow', QUIZ_DATA);
+
+/* ============================================================
+   PREDICT THE OUTPUT
+   ============================================================ */
+function initPredict(rootId, items){
+  const root = document.getElementById(rootId);
+  if(!root) return;
+  root.innerHTML = items.map((item, ix) => (
+    '<div class="predict-card" id="'+rootId+'-'+ix+'">'+
+      '<div class="predict-head">Predict the Output '+(ix+1)+' of '+items.length+'</div>'+
+      '<div class="predict-body">'+
+        '<pre class="predict-code">'+item.code+'</pre>'+
+        '<div class="predict-side">'+
+          '<p class="predict-q">What does this program print?</p>'+
+          '<div class="predict-opts">'+
+            item.options.map((opt,oi) => '<button class="predict-opt" data-oi="'+oi+'">'+opt+'</button>').join('')+
+          '</div>'+
+          '<div class="predict-feedback" data-role="fb"></div>'+
+          '<a class="predict-trace" data-role="trace" href="#'+item.trace+'">↻ Trace the program</a>'+
+        '</div>'+
+      '</div>'+
+    '</div>'
+  )).join('');
+
+  items.forEach((item, ix) => {
+    const card = document.getElementById(rootId+'-'+ix);
+    let answered = false;
+    card.querySelectorAll('.predict-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if(answered) return;
+        answered = true;
+        const oi = Number(btn.dataset.oi);
+        const correct = oi === item.correct;
+        card.querySelectorAll('.predict-opt').forEach((b,bi) => {
+          b.disabled = true;
+          if(bi === item.correct) b.classList.add('correct');
+          else if(bi === oi) b.classList.add('incorrect');
+        });
+        const fb = card.querySelector('[data-role="fb"]');
+        fb.className = 'predict-feedback show ' + (correct ? 'right' : 'wrong');
+        fb.textContent = (correct ? '🎉 Correct! ' : 'Not quite. ') + item.explain;
+        card.querySelector('[data-role="trace"]').classList.add('show');
+      });
+    });
+  });
+}
+
+const PREDICT_DATA = [
+  {
+    code: 'int age;\ncin&gt;&gt;age;   <span style="color:#8D97AC">// 15</span>\nif(age&gt;=18)\n    cout&lt;&lt;"You are eligible for voting ....";\ncout&lt;&lt;"This statement is always executed.";',
+    options: ['You are eligible for voting ....\\nThis statement is always executed.', 'This statement is always executed.', 'Nothing is printed', 'It is a compile error'],
+    correct: 1,
+    explain: 'Only <code>cout&lt;&lt;"You are eligible for voting ...."</code> is inside the if — there are no braces, so the true-block is just that one line. The next cout is outside the if, so it runs no matter what age is. Since 15 &lt; 18, only "This statement is always executed." prints.',
+    trace: 'sim-if'
+  },
+  {
+    code: 'int num;\ncin&gt;&gt;num;   <span style="color:#8D97AC">// 9</span>\nswitch(num)\n{\n    case 1: cout&lt;&lt;"Sunday"; break;\n    ...\n    case 7: cout&lt;&lt;"Saturday"; break;\n    default: cout&lt;&lt;"Wrong input....";\n}',
+    options: ['Sunday', 'Saturday', 'Wrong input....', 'Nothing — the switch is skipped'],
+    correct: 2,
+    explain: '9 does not match any case constant (1–7), so control falls to the default label, which prints "Wrong input....".',
+    trace: 'sim-switch'
+  },
+  {
+    code: 'int n = 10;\ndo\n{\n    cout&lt;&lt;n&lt;&lt;", ";\n    n--;\n}while (n&gt;0) ;',
+    options: ['10, 9, 8, 7, 6, 5, 4, 3, 2, 1, ', '10, 9, 8, ... 1, 0, ', '1, 2, 3, ... 10, ', 'Only "10, " is printed once'],
+    correct: 0,
+    explain: 'do-while prints n first, then decrements, then checks the condition. It keeps going while n&gt;0, so it prints 10 down to 1 and stops the moment n becomes 0.',
+    trace: 'sim-dowhile'
+  },
+  {
+    code: 'int count = 1;\ndo\n{\n    cout&lt;&lt;"Count : "&lt;&lt;count&lt;&lt;endl;\n    if(count &gt;= 3){ break; }\n    count++;\n}while(count &lt; 20);',
+    options: ['It prints Count : 1 through Count : 20', 'It prints Count : 1, Count : 2, Count : 3 and then stops', 'It is an infinite loop', 'It prints nothing because of the break'],
+    correct: 1,
+    explain: 'Even though the loop condition allows up to 20 iterations, break fires as soon as count reaches 3 — terminating the loop immediately after printing "Count : 3".',
+    trace: 'sim-break'
+  },
+  {
+    code: 'for(int i = 1; i&lt;=10; i++)\n{\n    if(i == 6)\n        continue;\n    else\n        cout&lt;&lt;i&lt;&lt;" ";\n}',
+    options: ['1 2 3 4 5 6 7 8 9 10', '1 2 3 4 5 7 8 9 10', '1 2 3 4 5', 'The loop stops as soon as i reaches 6'],
+    correct: 1,
+    explain: 'continue only skips the printing for that one iteration (i==6) and jumps to the next iteration — it does not stop the loop like break would. So every number 1–10 prints except 6.',
+    trace: 'sim-continue'
+  }
+];
+initPredict('predict-flow', PREDICT_DATA);
+
+/* ============================================================
+   DEBUGGING LAB
+   ============================================================ */
+function initDebug(rootId, exercises){
+  const root = document.getElementById(rootId);
+  if(!root) return;
+  root.innerHTML = exercises.map((ex, ix) => (
+    '<div class="debug-card" id="'+rootId+'-'+ix+'">'+
+      '<div class="debug-head">Debug '+(ix+1)+' of '+exercises.length+' — '+ex.title+'</div>'+
+      '<div class="debug-body">'+
+        '<p class="debug-instructions">Click the line you think is wrong, then choose the type of mistake.</p>'+
+        '<pre class="debug-code" data-role="code">'+
+          ex.lines.map((l,li) => '<span class="debug-line" data-line="'+(li+1)+'"><span class="ln">'+(li+1)+'</span>'+l+'</span>').join('\n')+
+        '</pre>'+
+        '<div class="debug-types">'+
+          ['Syntax error','Logical error','Runtime error'].map(t => '<button class="debug-type-btn" data-type="'+t+'">'+t+'</button>').join('')+
+        '</div>'+
+        '<div class="debug-feedback" data-role="fb"></div>'+
+        '<div class="debug-hintbox" data-role="hint">💡 '+ex.hint+'</div>'+
+        '<div class="debug-actions">'+
+          '<button class="debug-btn" data-role="hint-btn">Show Hint</button>'+
+          '<button class="debug-btn" data-role="fix-btn">Show Fix &amp; Explanation</button>'+
+        '</div>'+
+        '<div class="debug-fixed" data-role="fixed">'+
+          '<div class="debug-fixed-label">✅ Corrected code</div>'+
+          '<pre>'+ex.fixed+'</pre>'+
+        '</div>'+
+        '<p class="debug-explain" data-role="explain">'+ex.explain+'</p>'+
+      '</div>'+
+    '</div>'
+  )).join('');
+
+  exercises.forEach((ex, ix) => {
+    const card = document.getElementById(rootId+'-'+ix);
+    let pickedLine = null;
+    card.querySelectorAll('.debug-line').forEach(line => {
+      line.addEventListener('click', () => {
+        card.querySelectorAll('.debug-line').forEach(l => l.classList.remove('picked'));
+        line.classList.add('picked');
+        pickedLine = Number(line.dataset.line);
+      });
+    });
+    card.querySelectorAll('.debug-type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        card.querySelectorAll('.debug-type-btn').forEach(b => b.classList.remove('correct','incorrect'));
+        const fb = card.querySelector('[data-role="fb"]');
+        if(pickedLine === null){
+          fb.className = 'debug-feedback show wrong';
+          fb.textContent = 'Click a line in the code above first, then pick a mistake type.';
+          return;
+        }
+        const lineRight = pickedLine === ex.buggyLine;
+        const typeRight = btn.dataset.type === ex.type;
+        btn.classList.add(typeRight ? 'correct' : 'incorrect');
+        fb.className = 'debug-feedback show ' + (lineRight && typeRight ? 'right' : 'wrong');
+        if(lineRight && typeRight){
+          fb.textContent = '🎉 Correct on both counts! ' + ex.explain;
+          card.querySelector('[data-role="explain"]').classList.add('show');
+          card.querySelector('[data-role="fixed"]').classList.add('show');
+          const l = card.querySelector('.debug-line[data-line="'+ex.buggyLine+'"]');
+          if(l) l.classList.add('reveal-correct');
+        } else if(!lineRight && typeRight){
+          fb.textContent = 'The mistake type is right, but that\'s not the line causing it. Look again, or use a hint.';
+        } else if(lineRight && !typeRight){
+          fb.textContent = 'That\'s the right line — but think again about what kind of mistake it is.';
+        } else {
+          fb.textContent = 'Not quite yet. Re-read the line you picked, or use a hint.';
+        }
+      });
+    });
+    card.querySelector('[data-role="hint-btn"]').addEventListener('click', () => {
+      card.querySelector('[data-role="hint"]').classList.add('show');
+    });
+    card.querySelector('[data-role="fix-btn"]').addEventListener('click', () => {
+      card.querySelector('[data-role="fixed"]').classList.add('show');
+      card.querySelector('[data-role="explain"]').classList.add('show');
+      const l = card.querySelector('.debug-line[data-line="'+ex.buggyLine+'"]');
+      if(l) l.classList.add('reveal-correct');
+    });
+  });
+}
+
+const DEBUG_DATA = [
+  {
+    title: 'voting eligibility check',
+    lines: [
+      'int age;',
+      'cin&gt;&gt;age;',
+      'if(age&gt;=18);',
+      '{',
+      '    cout&lt;&lt;"You are eligible for voting";',
+      '}'
+    ],
+    buggyLine: 3,
+    type: 'Logical error',
+    hint: 'Look right after the closing parenthesis of the if condition. What single character is sitting there, and what statement does it make on its own?',
+    explain: ' The semicolon right after <code>if(age&gt;=18)</code> is itself a complete null statement — so that becomes the true-block, and the if does nothing conditional at all. The <code>{ ... }</code> block below is a separate, unconditional block that always runs, so "You are eligible for voting" prints no matter what age is. The program compiles and runs fine — it just gives the wrong result — which makes this a logical error, not a syntax error.',
+    fixed: 'int age;\ncin&gt;&gt;age;\nif(age&gt;=18)\n{\n    cout&lt;&lt;"You are eligible for voting";\n}'
+  },
+  {
+    title: 'weekday switch with a missing break',
+    lines: [
+      'switch(num)',
+      '{',
+      '    case 1: cout&lt;&lt;"Sunday"; break;',
+      '    case 2: cout&lt;&lt;"Monday";',
+      '    case 3: cout&lt;&lt;"Tuesday"; break;',
+      '    default: cout&lt;&lt;"Wrong input....";',
+      '}'
+    ],
+    buggyLine: 4,
+    type: 'Logical error',
+    hint: 'Recall the textbook rule about what happens when break is left out of a case.',
+    explain: ' Case 2 has no break. As the textbook rule states, when break is omitted, control falls through into the next case and keeps going until it hits a break. So for num = 2, the program prints "Monday" and then falls straight into case 3, printing "Tuesday" too — giving "MondayTuesday" instead of just "Monday". It still compiles and runs, so it\'s a logical error, not a syntax error.',
+    fixed: 'switch(num)\n{\n    case 1: cout&lt;&lt;"Sunday"; break;\n    case 2: cout&lt;&lt;"Monday"; break;\n    case 3: cout&lt;&lt;"Tuesday"; break;\n    default: cout&lt;&lt;"Wrong input....";\n}'
+  },
+  {
+    title: 'sum of 1 to 10 that never finishes',
+    lines: [
+      'int i, sum=0;',
+      'for(i=1; i&lt;=10;)',
+      '{',
+      '    sum=sum+i;',
+      '}',
+      'cout&lt;&lt;"The sum of 1 to 10 is "&lt;&lt;sum;'
+    ],
+    buggyLine: 2,
+    type: 'Logical error',
+    hint: 'A for loop has three parts — initialization, test-expression, and update-expression. Are all three doing their job here?',
+    explain: ' The update-expression (<code>i++</code>) is missing, so i stays at 1 forever and <code>i&lt;=10</code> never becomes false — the loop runs forever and the program never reaches the cout line. This is a logical error (the loop\'s update step was left out) that shows up as a runtime symptom: the program hangs instead of crashing or misprinting.',
+    fixed: 'int i, sum=0;\nfor(i=1; i&lt;=10; i++)\n{\n    sum=sum+i;\n}\ncout&lt;&lt;"The sum of 1 to 10 is "&lt;&lt;sum;'
+  }
+];
+initDebug('debug-flow', DEBUG_DATA);
+
+/* ============================================================
+   LIVE PLAYGROUNDS
+   ============================================================ */
+function initLiveIf(){
+  const root = document.getElementById('live-if');
+  if(!root) return;
+  const input = root.querySelector('#live-if-age');
+  const btn = root.querySelector('[data-action="run-live-if"]');
+  const out = root.querySelector('#live-if-output');
+  function run(){
+    const age = parseInt(input.value, 10);
+    if(Number.isNaN(age)){ out.textContent = 'Enter a whole number for age first.'; return; }
+    const lines = ['Enter your age: ' + age];
+    if(age >= 18) lines.push('You are eligible for voting ....');
+    lines.push('This statement is always executed.');
+    out.textContent = lines.join('\n');
+  }
+  btn.addEventListener('click', run);
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') run(); });
+  run();
+}
+initLiveIf();
+
+function initLiveSumN(){
+  const root = document.getElementById('live-sum-n');
+  if(!root) return;
+  const input = root.querySelector('#live-sum-n-input');
+  const btn = root.querySelector('[data-action="run-live-sum-n"]');
+  const out = root.querySelector('#live-sum-n-output');
+  function run(){
+    const n = parseInt(input.value, 10);
+    if(Number.isNaN(n) || n < 0){ out.textContent = 'Enter a whole number of 0 or more for n first.'; return; }
+    let sum = 0;
+    for(let i=1;i<=n;i++){ sum += i; }
+    out.textContent = 'Enter the value of n' + n + '\nThe Sum of 1 to ' + n + ' is ' + sum;
+  }
+  btn.addEventListener('click', run);
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') run(); });
+  run();
+}
+initLiveSumN();
+
+function initLivePattern(){
+  const root = document.getElementById('live-pattern');
+  if(!root) return;
+  const rowsInput = root.querySelector('#live-pattern-rows');
+  const typeSel = root.querySelector('#live-pattern-type');
+  const btn = root.querySelector('[data-action="run-live-pattern"]');
+  const out = root.querySelector('#live-pattern-output');
+  function run(){
+    let rows = parseInt(rowsInput.value, 10);
+    if(Number.isNaN(rows) || rows < 1) rows = 1;
+    if(rows > 9) rows = 9;
+    rowsInput.value = rows;
+    const type = typeSel.value;
+    const lines = [];
+    if(type === 'mult'){
+      for(let c=1; c<=rows; c++){
+        let row = c + '| ';
+        for(let i=1; i<=rows; i++){ row += (i*c) + '\t'; }
+        lines.push(row);
+      }
+    } else if(type === 'stars'){
+      for(let c=1; c<=rows; c++){ lines.push('*'.repeat(c)); }
+    } else {
+      for(let c=1; c<=rows; c++){
+        lines.push(' '.repeat(rows-c) + '*'.repeat(2*c-1));
+      }
+    }
+    out.textContent = lines.join('\n');
+  }
+  btn.addEventListener('click', run);
+  rowsInput.addEventListener('keydown', e => { if(e.key === 'Enter') run(); });
+  typeSel.addEventListener('change', run);
+  run();
+}
+initLivePattern();
+
+const links = Array.from(document.querySelectorAll('.sidebar a'));
+const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+const progressText = document.querySelector('[data-role="progress-text"]');
+const progressFill = document.querySelector('[data-role="progress-fill"]');
+function updateProgress(activeLink){
+  if(!progressText || !progressFill) return;
+  const idx = activeLink ? links.indexOf(activeLink) + 1 : 0;
+  const total = links.length;
+  progressText.textContent = idx + ' / ' + total + ' sections';
+  progressFill.style.width = Math.round((idx/total)*100) + '%';
+}
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const id = '#' + entry.target.id;
+    const link = links.find(a => a.getAttribute('href') === id);
+    if (!link) return;
+    if (entry.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      updateProgress(link);
+    }
+  });
+}, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+sections.forEach(s => observer.observe(s));
+updateProgress(null);
+</script>
+
+</body>
+</html>

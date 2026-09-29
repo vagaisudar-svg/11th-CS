@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ Learning Lab — Chapter 9: Introduction to C++</title>
+<style>
+  :root{
+    --ink-900:#10161d;
+    --ink-800:#182531;
+    --ink-700:#243544;
+    --ink-600:#37505f;
+    --paper:#f5f2ea;
+    --paper-dim:#eae5d8;
+    --card:#ffffff;
+    --amber:#d98e2b;
+    --amber-dim:#f1cf94;
+    --teal:#2f7f78;
+    --teal-dim:#cfe6e3;
+    --red:#b8483f;
+    --green:#3f7a4e;
+    --line:#dcd5c3;
+    --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --serif: Georgia, "Times New Roman", "Noto Serif Tamil", serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink-900);
+    font-family:var(--serif);
+    line-height:1.55;
+  }
+  ::selection{background:var(--amber-dim);}
+  h1,h2,h3,h4{font-family:var(--sans); font-weight:700; letter-spacing:-0.01em; margin:0 0 .4em 0;}
+  code, .mono{font-family:var(--mono);}
+  a{color:var(--teal);}
+  button{font-family:var(--sans); cursor:pointer;}
+  input, select{font-family:var(--mono);}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    background:var(--ink-900);
+    color:var(--paper);
+    padding:16px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    border-bottom:3px solid var(--amber);
+  }
+  .topbar .brand{display:flex; align-items:baseline; gap:12px;}
+  .topbar .brand .cursor{
+    display:inline-block; width:10px; height:22px; background:var(--amber);
+    animation:blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+  .topbar h1{font-size:1.15rem; color:#fff; margin:0;}
+  .topbar .sub{font-size:.78rem; color:var(--amber-dim); font-family:var(--mono);}
+  .topbar .controls{display:flex; gap:10px; align-items:center;}
+  .lang-toggle{
+    display:flex; background:var(--ink-700); border-radius:20px; padding:3px; font-family:var(--mono); font-size:.78rem;
+  }
+  .lang-toggle button{
+    border:none; background:transparent; color:var(--paper-dim); padding:5px 12px; border-radius:16px;
+  }
+  .lang-toggle button.active{background:var(--amber); color:var(--ink-900); font-weight:700;}
+  .progress-chip{
+    font-family:var(--mono); font-size:.75rem; color:var(--paper-dim);
+    display:flex; align-items:center; gap:8px;
+  }
+  .progress-chip .bar{width:90px; height:7px; background:var(--ink-700); border-radius:4px; overflow:hidden;}
+  .progress-chip .bar > div{height:100%; background:var(--teal); width:0%; transition:width .4s ease;}
+
+  /* ---------- Layout ---------- */
+  .app{display:flex; min-height:calc(100vh - 62px);}
+  .sidebar{
+    width:250px; flex:0 0 250px; background:var(--ink-800); color:var(--paper-dim);
+    padding:18px 0; position:sticky; top:0; align-self:flex-start; height:calc(100vh); overflow-y:auto;
+  }
+  .sidebar .group-label{
+    font-family:var(--mono); font-size:.68rem; text-transform:none; color:var(--amber-dim);
+    padding:14px 18px 6px;
+  }
+  .nav-item{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:none;
+    color:var(--paper-dim); padding:9px 18px; font-size:.88rem; border-left:3px solid transparent;
+  }
+  .nav-item:hover{background:var(--ink-700);}
+  .nav-item.current{background:var(--ink-700); border-left-color:var(--amber); color:#fff; font-weight:600;}
+  .nav-item .tick{
+    width:16px; height:16px; border-radius:50%; border:1.5px solid var(--ink-600); flex:0 0 16px;
+    display:flex; align-items:center; justify-content:center; font-size:.62rem;
+  }
+  .nav-item.done .tick{background:var(--teal); border-color:var(--teal); color:#fff;}
+
+  .content{flex:1; padding:28px 34px 80px; max-width:900px;}
+  .panel{display:none;}
+  .panel.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .eyebrow{font-family:var(--mono); color:var(--teal); font-size:.78rem; margin-bottom:6px;}
+  .panel > h2{font-size:1.7rem; margin-bottom:4px;}
+  .panel .lede{color:var(--ink-600); margin-bottom:26px; max-width:66ch;}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:20px 22px; margin-bottom:20px;
+  }
+  .card h3{font-size:1.05rem; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .card h4{font-size:.92rem; margin:14px 0 6px; color:var(--ink-700);}
+  .label-tag{
+    font-family:var(--mono); font-size:.66rem; text-transform:uppercase; letter-spacing:.04em;
+    background:var(--teal-dim); color:var(--teal); padding:2px 8px; border-radius:10px;
+  }
+  .label-tag.textbook{background:#e7e0cd; color:#7a6a2f;}
+  .label-tag.easy{background:var(--amber-dim); color:#8a5a10;}
+  .label-tag.activity{background:#dbe9f7; color:#2b5f8a;}
+
+  pre.codebox{
+    background:var(--ink-900); color:#eae6da; padding:14px 16px; border-radius:8px;
+    font-family:var(--mono); font-size:.85rem; overflow-x:auto; line-height:1.6; margin:10px 0;
+    border-left:3px solid var(--amber);
+  }
+  .codebox .ln{color:#6d8a95; user-select:none; display:inline-block; width:1.6em;}
+  .out-box{
+    background:#0e1b12; color:#b7f0c1; font-family:var(--mono); font-size:.85rem;
+    padding:10px 14px; border-radius:8px; margin-top:6px; white-space:pre-wrap;
+  }
+  .note{
+    background:#fdf6e6; border:1px solid var(--amber-dim); border-radius:8px; padding:10px 14px;
+    font-size:.88rem; margin:10px 0;
+  }
+  .note.mistake{background:#fbeceb; border-color:#e3b6b1;}
+  .note.exam{background:#eef3ee; border-color:#bfd8c4;}
+
+  table.ref{width:100%; border-collapse:collapse; font-size:.87rem; margin:10px 0;}
+  table.ref th, table.ref td{border:1px solid var(--line); padding:7px 10px; text-align:left;}
+  table.ref th{background:var(--paper-dim); font-family:var(--sans); font-size:.78rem;}
+  table.ref td.mono, table.ref th.mono{font-family:var(--mono);}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+  .chip-row{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0;}
+  .chip{
+    font-family:var(--mono); font-size:.8rem; background:var(--paper-dim); border:1px solid var(--line);
+    padding:4px 10px; border-radius:6px;
+  }
+  .chip.kw{background:var(--ink-800); color:var(--amber-dim); border-color:var(--ink-700);}
+
+  /* variable box for memory visualization */
+  .varbox{
+    display:inline-flex; flex-direction:column; align-items:center; border:2px solid var(--ink-700);
+    border-radius:8px; min-width:110px; margin:6px 10px 6px 0; overflow:hidden;
+  }
+  .varbox .vname{background:var(--ink-700); color:#fff; font-family:var(--mono); font-size:.75rem; padding:3px 8px; width:100%; text-align:center;}
+  .varbox .vval{font-family:var(--mono); font-size:1.2rem; padding:8px 14px; font-weight:700; color:var(--teal);}
+  .arrow{font-size:1.4rem; color:var(--amber); margin:0 8px; vertical-align:middle;}
+
+  .sim-controls{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0;}
+  .btn{
+    background:var(--ink-800); color:#fff; border:none; padding:8px 16px; border-radius:6px; font-size:.85rem; font-weight:600;
+  }
+  .btn:hover{background:var(--ink-700);}
+  .btn.primary{background:var(--teal);}
+  .btn.primary:hover{background:#276e68;}
+  .btn.ghost{background:transparent; color:var(--ink-800); border:1px solid var(--line);}
+  .btn:disabled{opacity:.4; cursor:not-allowed;}
+
+  input[type=text], input[type=number], select{
+    padding:7px 10px; border:1px solid var(--line); border-radius:6px; font-size:.9rem; background:#fff;
+  }
+  .field-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0;}
+  .field-row label{font-family:var(--sans); font-size:.82rem; color:var(--ink-700);}
+
+  .result-badge{
+    display:inline-block; padding:4px 12px; border-radius:20px; font-family:var(--sans); font-weight:700; font-size:.82rem;
+  }
+  .result-badge.valid{background:#dff1e0; color:var(--green);}
+  .result-badge.invalid{background:#f8dedb; color:var(--red);}
+
+  /* quiz */
+  .quiz-q{margin-bottom:22px; padding-bottom:18px; border-bottom:1px dashed var(--line);}
+  .quiz-q:last-child{border-bottom:none;}
+  .quiz-opts{display:grid; gap:8px; margin-top:10px;}
+  .quiz-opt{
+    text-align:left; background:#fff; border:1px solid var(--line); border-radius:7px; padding:9px 12px; font-size:.88rem;
+  }
+  .quiz-opt:hover{border-color:var(--teal);}
+  .quiz-opt.correct{background:#dff1e0; border-color:var(--green);}
+  .quiz-opt.wrong{background:#f8dedb; border-color:var(--red);}
+  .quiz-feedback{margin-top:8px; font-size:.85rem; font-family:var(--sans);}
+  .score-pill{
+    font-family:var(--mono); background:var(--ink-900); color:var(--amber-dim); padding:6px 14px; border-radius:20px;
+    display:inline-block; margin-bottom:16px;
+  }
+
+  .footer-nav{
+    position:sticky; bottom:0; background:var(--paper); border-top:1px solid var(--line);
+    padding:12px 34px; display:flex; justify-content:space-between; align-items:center; margin-left:-34px; margin-right:-34px; margin-top:30px;
+  }
+  .footer-nav .btn{min-width:110px;}
+
+  .difficulty{font-family:var(--mono); font-size:.72rem; padding:2px 8px; border-radius:10px;}
+  .diff-beginner{background:#dff1e0; color:var(--green);}
+  .diff-practice{background:#f1e6c9; color:#8a6a10;}
+  .diff-challenge{background:#f8dedb; color:var(--red);}
+
+  .tamil{font-family:"Noto Sans Tamil", var(--serif);}
+  [lang-block]{display:none;}
+  [lang-block="en"].shown, [lang-block="ta"].shown{display:block;}
+  .toc-mini{font-size:.8rem; color:var(--ink-600); margin:0 0 18px;}
+  .toc-mini a{margin-right:12px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="cursor"></span>
+    <div>
+      <h1>C++ Learning Lab</h1>
+      <div class="sub">Class 11 · Tamil Nadu State Board · Unit III, Chapter 9 — Introduction to C++</div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="progress-chip">
+      <span id="progressLabel">0 / 9 sections</span>
+      <div class="bar"><div id="progressBar"></div></div>
+    </div>
+    <div class="lang-toggle">
+      <button id="btnEn" class="active" onclick="setLang('en')">English</button>
+      <button id="btnTa" onclick="setLang('ta')">தமிழ்</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <nav class="sidebar" id="sidebar">
+    <div class="group-label">CHAPTER 9</div>
+    <button class="nav-item" data-section="overview" onclick="goTo('overview')"><span class="tick"></span> 1. Overview &amp; History</button>
+    <button class="nav-item" data-section="charset" onclick="goTo('charset')"><span class="tick"></span> 2. Character Set</button>
+    <button class="nav-item" data-section="tokens" onclick="goTo('tokens')"><span class="tick"></span> 3. Tokens (map)</button>
+    <button class="nav-item" data-section="keywords" onclick="goTo('keywords')"><span class="tick"></span> 4. Keywords</button>
+    <button class="nav-item" data-section="identifiers" onclick="goTo('identifiers')"><span class="tick"></span> 5. Identifiers</button>
+    <button class="nav-item" data-section="literals" onclick="goTo('literals')"><span class="tick"></span> 6. Literals / Constants</button>
+    <button class="nav-item" data-section="operators" onclick="goTo('operators')"><span class="tick"></span> 7. Operators</button>
+    <button class="nav-item" data-section="punctuators" onclick="goTo('punctuators')"><span class="tick"></span> 8. Punctuators &amp; Precedence</button>
+    <div class="group-label">PRACTICE</div>
+    <button class="nav-item" data-section="practice" onclick="goTo('practice')"><span class="tick"></span> 9. Quick Quiz</button>
+    <button class="nav-item" data-section="exam" onclick="goTo('exam')"><span class="tick"></span> 10. Exam Revision</button>
+  </nav>
+
+  <main class="content">
+
+    <!-- ================= OVERVIEW ================= -->
+    <section class="panel active" id="sec-overview">
+      <div class="eyebrow mono">9.1 Introduction</div>
+      <h2>What is C++, and where did it come from?</h2>
+      <p class="lede">Straight from the textbook, with a few extra explanations to help the ideas stick.</p>
+
+      <div class="card">
+        <h3><span class="label-tag textbook">Textbook</span> Definition</h3>
+        <p>C++ is one of the most popular programming languages which supports both procedural and Object Oriented Programming paradigms. Because of this, C++ is called a <b>hybrid language</b>. C++ is a superset (extension) of its predecessor, the C language. Bjarne Stroustrup named his new language "C with Classes". The name <b>C++</b> was coined by Rick Mascitti, where <code>++</code> is the C language increment operator.</p>
+        <div class="note">
+          <b>Easy Explanation:</b> "Hybrid" means "mixed". C++ mixes two styles of programming — step-by-step instructions (procedural, like C) and organising code into objects (Object Oriented Programming). It's like a vehicle that can run on two kinds of fuel.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Bjarne Stroustrup — Inventor of C++</h3>
+        <p>Bjarne is a Danish Computer Scientist born on 30th December 1950. He has a Master's degree in Mathematics and Computer Science (1975, Aarhus University, Denmark) and a Ph.D. in Computer Science (1979, University of Cambridge, England).</p>
+      </div>
+
+      <div class="card">
+        <h3>History of C++ <span class="difficulty diff-beginner">timeline</span></h3>
+        <div class="grid3" style="margin-top:10px;">
+          <div class="card" style="margin:0; background:var(--paper-dim);">
+            <div class="mono" style="color:var(--teal); font-weight:700;">1979</div>
+            <p style="margin:6px 0 0; font-size:.88rem;">Bjarne Stroustrup develops C++ at AT&amp;T Bell Laboratory. C++ is derived from C, and influenced by Simula, BCPL, Ada, ML, CLU and ALGOL 68.</p>
+          </div>
+          <div class="card" style="margin:0; background:var(--paper-dim);">
+            <div class="mono" style="color:var(--teal); font-weight:700;">Till 1983</div>
+            <p style="margin:6px 0 0; font-size:.88rem;">The language is called "New C" and "C with Classes".</p>
+          </div>
+          <div class="card" style="margin:0; background:var(--paper-dim);">
+            <div class="mono" style="color:var(--teal); font-weight:700;">1983</div>
+            <p style="margin:6px 0 0; font-size:.88rem;">Rick Mascitti renames it <b>C++</b>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Benefits of learning C++</h3>
+        <ul>
+          <li>C++ is a highly portable language and is often the language of choice for multi-device, multi-platform app development.</li>
+          <li>C++ is an object-oriented programming language and includes <b>classes, inheritance, polymorphism, data abstraction</b> and <b>encapsulation</b>.</li>
+          <li>C++ has a rich function library.</li>
+          <li>C++ allows exception handling, inheritance and function overloading — which are not possible in C.</li>
+          <li>C++ is a powerful, efficient and fast language, used from GUI applications to 3D graphics for games to real-time mathematical simulations.</li>
+        </ul>
+        <div class="note exam"><b>Exam point:</b> "C is superset extended into C++" and "C++ was called C with Classes before 1983" are common one-mark facts.</div>
+      </div>
+
+      <div class="card">
+        <h3>Learning Objectives <span class="label-tag textbook">Textbook</span></h3>
+        <p>After completing this chapter, the student will be able to:</p>
+        <ul>
+          <li>Understand the basic building blocks of the C++ programming language</li>
+          <li>Construct simple C++ programs</li>
+          <li>Execute and debug C++ programs</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <b>Scope note:</b> This learning lab covers exactly what is present in the supplied chapter pages (115–122): Introduction/History, Character Set, Tokens (Keywords, Identifiers, Literals, Operators, Punctuators) and Precedence of Operators. The chapter continues beyond page 122 in the original textbook; topics such as program structure, input/output statements, and control flow are <i>not</i> included here because they were not part of the supplied pages.
+      </div>
+    </section>
+
+    <!-- ================= CHARACTER SET ================= -->
+    <section class="panel" id="sec-charset">
+      <div class="eyebrow mono">9.2 Character Set</div>
+      <h2>The building blocks of every C++ program</h2>
+      <p class="lede">Before words, there are letters. Before programs, there are characters.</p>
+
+      <div class="card">
+        <h3><span class="label-tag textbook">Textbook</span> Definition</h3>
+        <p>A character set is a set of characters which are used to write a C++ program. A character represents any alphabet, number, or any other symbol (special character) mostly available on the keyboard. C++ accepts the following characters:</p>
+        <table class="ref">
+          <tr><th>Category</th><th>Characters</th></tr>
+          <tr><td>Alphabets</td><td class="mono">A … Z, a … z</td></tr>
+          <tr><td>Numeric</td><td class="mono">0 … 9</td></tr>
+          <tr><td>Special Characters</td><td class="mono">+ - * / ~ ! @ # $ % ^ &amp; [ ] ( ) { } = &gt; &lt; _ \ | ? . , : ' " ;</td></tr>
+          <tr><td>White space</td><td>Blank space, Horizontal tab, Carriage return, Newline, Form feed</td></tr>
+          <tr><td>Other characters</td><td>C++ can process any of the 256 ASCII characters as data</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>🧪 Simulation: Character Classifier <span class="difficulty diff-beginner">Beginner</span></h3>
+        <p style="font-size:.88rem; color:var(--ink-600);">Type any single character (or press Space/Tab) to see which category the textbook places it in.</p>
+        <div class="field-row">
+          <label>Character:</label>
+          <input type="text" id="charInput" maxlength="1" placeholder="e.g. A" oninput="classifyChar()">
+          <span id="charResult" class="result-badge">—</span>
+        </div>
+        <div id="charExplain" class="note" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- ================= TOKENS MAP ================= -->
+    <section class="panel" id="sec-tokens">
+      <div class="eyebrow mono">9.3 Lexical Units (Tokens)</div>
+      <h2>Every program is built from five kinds of pieces</h2>
+      <p class="lede">A token is the smallest individual unit in a program.</p>
+
+      <div class="card">
+        <h3><span class="label-tag textbook">Textbook</span> Definition</h3>
+        <p>C++ program statements are constructed by many different small elements such as commands, variables, constants, and many more symbols called operators and punctuators. These individual elements are collectively called <b>Lexical units</b> or <b>Lexical elements</b> or <b>Tokens</b>.</p>
+        <div class="note exam"><b>Exam point (1-mark definition):</b> "TOKEN — The smallest individual unit in a program is known as a Token or a Lexical unit."</div>
+      </div>
+
+      <div class="card">
+        <h3>Concept map of Section 9.3</h3>
+        <p style="font-size:.85rem; color:var(--ink-600);">Click a token type below to jump straight to it.</p>
+        <div class="grid3">
+          <button class="btn ghost" style="text-align:left; padding:14px;" onclick="goTo('keywords')">
+            <b>Keywords</b><br><span style="font-size:.8rem; color:var(--ink-600);">Reserved words, fixed meaning</span>
+          </button>
+          <button class="btn ghost" style="text-align:left; padding:14px;" onclick="goTo('identifiers')">
+            <b>Identifiers</b><br><span style="font-size:.8rem; color:var(--ink-600);">Names you create</span>
+          </button>
+          <button class="btn ghost" style="text-align:left; padding:14px;" onclick="goTo('literals')">
+            <b>Literals</b><br><span style="font-size:.8rem; color:var(--ink-600);">Fixed values / constants</span>
+          </button>
+          <button class="btn ghost" style="text-align:left; padding:14px;" onclick="goTo('operators')">
+            <b>Operators</b><br><span style="font-size:.8rem; color:var(--ink-600);">Symbols that act on data</span>
+          </button>
+          <button class="btn ghost" style="text-align:left; padding:14px;" onclick="goTo('punctuators')">
+            <b>Punctuators</b><br><span style="font-size:.8rem; color:var(--ink-600);">Separators / delimiters</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Code Explorer <span class="label-tag activity">Learning Activity</span></h3>
+        <p style="font-size:.85rem; color:var(--ink-600);">Click any highlighted word in this tiny program to see what kind of token it is.</p>
+        <pre class="codebox" id="tokenCode"><span class="ln">1</span>int main ( )
+<span class="ln">2</span>{
+<span class="ln">3</span>&#160;&#160;int x = 10, y = 20, sum;
+<span class="ln">4</span>&#160;&#160;sum = x + y;
+<span class="ln">5</span>&#160;&#160;cout &lt;&lt; sum;
+<span class="ln">6</span>}</pre>
+        <div class="chip-row" id="tokenChips"></div>
+        <div id="tokenExplain" class="note" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- ================= KEYWORDS ================= -->
+    <section class="panel" id="sec-keywords">
+      <div class="eyebrow mono">9.3.1 Keywords</div>
+      <h2>Words the compiler has already claimed</h2>
+
+      <div class="card">
+        <h3><span class="label-tag textbook">Textbook</span> Definition</h3>
+        <p>Keywords are the reserved words which convey specific meaning to the C++ compiler. They are the essential elements to construct C++ programs. Most of the keywords are common to C, C++ and Java. <b>C++ is a case sensitive programming language, so all keywords must be in lowercase.</b></p>
+        <div class="note">Identifiers containing a double underscore (<code>__</code>) are reserved for use by C++ implementations and standard libraries, and should be avoided by users.</div>
+      </div>
+
+      <div class="card">
+        <h3>Table 9.1 — C++ Keywords <span class="label-tag textbook">Textbook</span></h3>
+        <div class="chip-row" id="kwChipRow"></div>
+        <h4>Recent additions mentioned in the textbook</h4>
+        <div class="chip-row" id="kwChipRow2"></div>
+        <div class="note" style="font-size:.8rem;">The scanned textbook text lists these extra keywords as: <span class="mono">using, namespace, bal, static_cast, const_cast, dynamic_cast, true, false</span>. "bal" does not match any standard C++ keyword and looks like a scanning artifact in the source PDF — it has been left out of the interactive checker below so the tool isn't teaching a word that isn't real.</div>
+      </div>
+
+      <div class="card">
+        <h3>🧪 Simulation: Is this a Keyword? <span class="difficulty diff-beginner">Beginner</span></h3>
+        <div class="field-row">
+          <label>Word:</label>
+          <input type="text" id="kwInput" placeholder="e.g. for" oninput="checkKeyword()">
+          <span id="kwResult" class="result-badge">—</span>
+        </div>
+        <div id="kwExplain" class="note" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- ================= IDENTIFIERS ================= -->
+    <section class="panel" id="sec-identifiers">
+      <div class="eyebrow mono">9.3.2 Identifiers</div>
+      <h2>Names you choose for your program's parts</h2>
+
+      <div class="card">
+        <h3><span class="label-tag textbook">Textbook</span> Definition</h3>
+        <p>Identifiers are the user-defined names given to different parts of a C++ program, viz. variables, functions, arrays, classes, etc. These are the fundamental building blocks of a program.</p>
+        <h4>Rules for naming an identifier</h4>
+        <ul>
+          <li>The first character of an identifier must be an alphabet or an underscore (<code>_</code>).</li>
+          <li>Only alphabets, digits and underscore are permitted. Other special characters are not allowed.</li>
+          <li>C++ is case sensitive — it treats upper and lower-case characters differently.</li>
+          <li>Reserved words (keywords) cannot be used as an identifier name.</li>
+          <li>As per ANSI standards, C++ places no limit on identifier length, so all characters are significant.</li>
+        </ul>
+        <div class="note">You may use an underscore to separate parts of a name (e.g. <code>total_sales</code> is valid, but <code>total sales</code> with a space is invalid). You may also use "capital style" / camelCase, e.g. <code>tamilMark</code>.</div>
+      </div>
+
+      <div class="card">
+        <h3>Table — Valid / Invalid identifiers <span class="label-tag textbook">Textbook</span></h3>
+        <table class="ref">
+          <tr><th>Identifier</th><th>Valid / Invalid</th><th>Reason for invalid</th></tr>
+          <tr><td class="mono">Num</td><td>Valid</td><td>—</td></tr>
+          <tr><td class="mono">NUM</td><td>Valid</td><td>—</td></tr>
+          <tr><td class="mono">_add</td><td>Valid</td><td>—</td></tr>
+          <tr><td class="mono">total_sales</td><td>Valid</td><td>—</td></tr>
+          <tr><td class="mono">tamilMark</td><td>Valid</td><td>—</td></tr>
+          <tr><td class="mono">num-add</td><td>Invalid</td><td>Contains special character (-)</td></tr>
+          <tr><td class="mono">this</td><td>Invalid</td><td>"this" is a keyword; keywords cannot be identifiers</td></tr>
+          <tr><td class="mono">2myfile</td><td>Invalid</td><td>Name must begin with an alphabet or underscore</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>🧪 Simulation: Identifier Validator <span class="difficulty diff-practice">Practice</span></h3>
+        <p style="font-size:.85rem; color:var(--ink-600);">Type a proposed variable/function name and the tool will check it against every rule from the textbook, live.</p>
+        <div class="field-row">
+          <label>Identifier:</label>
+          <input type="text" id="idInput" placeholder="e.g. total_sales" oninput="checkIdentifier()">
+          <span id="idResult" class="result-badge">—</span>
+        </div>
+        <ul id="idRules" style="font-size:.85rem;"></ul>
+      </div>
+
+      <div class="card">
+        <h3>❌ Common Mistakes</h3>
+        <div class="note mistake"><b>Incorrect:</b> <code>int total sales = 0;</code><br><b>What is wrong?</b> There is a blank space inside the identifier — the compiler will read this as two separate words.<br><b>✅ Correct:</b> <code>int total_sales = 0;</code> — <i>Syntax error</i></div>
+        <div class="note mistake"><b>Incorrect:</b> <code>int this = 5;</code><br><b>What is wrong?</b> <code>this</code> is a reserved keyword and cannot be used as a variable name.<br><b>✅ Correct:</b> <code>int thisValue = 5;</code> — <i>Syntax error</i></div>
+      </div>
+    </section>
+
+    <!-- ================= LITERALS ================= -->
+    <section class="panel" id="sec-literals">
+      <div class="eyebrow mono">9.3.3 Literals (Constants)</div>
+      <h2>Values that never change while the program runs</h2>
+
+      <div class="card">
+        <h3><span class="label-tag textbook">Textbook</span> Definition</h3>
+        <p>Literals are data items whose values do not change during the execution of a program. Therefore literals are called <b>Constants</b>.</p>
+        <h4>Types of Constants (Figure 9.1)</h4>
+        <div class="grid3">
+          <div class="card" style="margin:0;"><b>Numeric Constants</b><ul style="font-size:.85rem; margin:6px 0 0 18px;"><li>Integer Constants</li><li>Real Constants</li></ul></div>
+          <div class="card" style="margin:0;"><b>Character Constants</b><p style="font-size:.85rem; margin:6px 0 0;">Single character in single quotes</p></div>
+          <div class="card" style="margin:0;"><b>Boolean Constants</b><p style="font-size:.85rem; margin:6px 0 0;">true (1) / false (0)</p></div>
+        </div>
+        <p style="margin-top:10px;">Plus <b>String Literals</b> — a sequence of characters in double quotes.</p>
+      </div>
+
+      <div class="card">
+        <h3>(1) Integer Constants — Decimal, Octal, Hexadecimal <span class="label-tag textbook">Textbook</span></h3>
+        <table class="ref">
+          <tr><th>Type</th><th>Rule</th><th>Valid</th><th>Invalid &amp; reason</th></tr>
+          <tr><td>Decimal</td><td>Any sequence of digits 0–9, optionally signed</td><td class="mono">725, -27</td><td class="mono">7,500 (comma) · 66 5 (space) · 9$ (special char)</td></tr>
+          <tr><td>Octal</td><td>Digits 0–7 only, must begin with 0</td><td class="mono">012, -027, +0231</td><td class="mono">05,600 (comma) · 04.56 (decimal point) · 0158 ('8' not a valid octal digit)</td></tr>
+          <tr><td>Hexadecimal</td><td>Digits 0–9, A–F, must begin with 0x or 0X</td><td class="mono">0x123, 0X568</td><td class="mono">0x1,A5 (comma) · 0x.14E (decimal point)</td></tr>
+        </table>
+        <div class="note">If you assign <code>4.56</code> as an integer decimal constant, the compiler accepts only the integer portion (<code>4</code>) and ignores <code>.56</code>. This is called <b>Implicit Conversion</b>.</div>
+        <div class="note">The suffix <code>L</code>/<code>l</code> or <code>U</code>/<code>u</code> added to any constant forces it to be treated as a <i>long</i> or <i>unsigned</i> constant respectively.</div>
+      </div>
+
+      <div class="card">
+        <h3>(2) Real (Floating Point) Constants <span class="label-tag textbook">Textbook</span></h3>
+        <p>A real constant has a fractional component. It can be written in <b>fractional form</b> (must have at least one digit before and after the decimal point) or <b>exponent form</b> (Mantissa + <code>E</code>/<code>e</code> + Exponent).</p>
+        <table class="ref">
+          <tr><th>Exponent form</th><th>Meaning</th><th>Fractional value</th></tr>
+          <tr><td class="mono">5.864 E1</td><td>10¹ × 5.864</td><td class="mono">58.64</td></tr>
+          <tr><td class="mono">5864 E-2</td><td>10⁻² × 5864</td><td class="mono">58.64</td></tr>
+          <tr><td class="mono">0.5864 E2</td><td>10² × 0.5864</td><td class="mono">58.64</td></tr>
+        </table>
+        <p style="font-size:.85rem; color:var(--ink-600);">Example: 58000000.00 may be written as 0.58 × 10⁸ or <code>0.58E8</code>.</p>
+      </div>
+
+      <div class="card">
+        <h3>Character &amp; String Literals, Boolean literals <span class="label-tag textbook">Textbook</span></h3>
+        <ul>
+          <li><b>Boolean literals</b> represent <code>true</code> or <code>false</code>. Internally <code>true</code> = 1 and <code>false</code> = 0.</li>
+          <li><b>Character constant:</b> any valid single character enclosed in single quotes, e.g. <code>'A'</code>, <code>'2'</code>, <code>'$'</code>. <code>"A"</code> (double quotes) is invalid as a character constant. Every character has an ASCII value — <code>'A'</code> is 65.</li>
+          <li><b>String literal:</b> a sequence of characters in double quotes, e.g. <code>"Welcome"</code>. A null character <code>'\0'</code> is automatically added at the end, so <code>"welcome"</code> is really stored as <code>"welcome\0"</code> — 8 characters, not 7.</li>
+        </ul>
+        <h4>Table 9.2 — Escape Sequences (non-graphic characters)</h4>
+        <table class="ref">
+          <tr><th class="mono">\a</th><td>Audible/alert bell</td><th class="mono">\v</th><td>Vertical tab</td></tr>
+          <tr><th class="mono">\b</th><td>Backspace</td><th class="mono">\\</th><td>Backslash</td></tr>
+          <tr><th class="mono">\f</th><td>Form feed</td><th class="mono">\'</th><td>Single quote</td></tr>
+          <tr><th class="mono">\n</th><td>Newline / linefeed</td><th class="mono">\"</th><td>Double quote</td></tr>
+          <tr><th class="mono">\r</th><td>Carriage return</td><th class="mono">\?</th><td>Question mark</td></tr>
+          <tr><th class="mono">\t</th><td>Horizontal tab</td><th class="mono">\0</th><td>Null</td></tr>
+        </table>
+        <div class="note">An escape sequence has two characters, but is still enclosed in single quotes because C++ treats it as one character constant — it takes exactly one byte in ASCII.</div>
+      </div>
+
+      <div class="card">
+        <h3>🧪 Simulation: Literal Classifier <span class="difficulty diff-practice">Practice</span></h3>
+        <p style="font-size:.85rem; color:var(--ink-600);">Type any literal exactly as it would appear in code (e.g. <code>012</code>, <code>0x1F</code>, <code>3.14</code>, <code>'A'</code>, <code>"Hi"</code>, <code>true</code>) and see how the textbook's rules classify it.</p>
+        <div class="field-row">
+          <label>Literal:</label>
+          <input type="text" id="litInput" placeholder="e.g. 0x1F" style="width:220px;" oninput="classifyLiteral()">
+          <span id="litResult" class="result-badge">—</span>
+        </div>
+        <div id="litExplain" class="note" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- ================= OPERATORS ================= -->
+    <section class="panel" id="sec-operators">
+      <div class="eyebrow mono">9.3.4 Operators</div>
+      <h2>Symbols that act on data</h2>
+
+      <div class="card">
+        <h3><span class="label-tag textbook">Textbook</span> Definition</h3>
+        <p>The symbols which are used to perform mathematical or logical operations are called <b>Operators</b>. The data items or values that the operators act upon are called <b>Operands</b>.</p>
+        <div style="text-align:center; margin:14px 0;">
+          <span class="varbox" style="min-width:60px;"><span class="vname">operand</span><span class="vval">5</span></span>
+          <span class="arrow">+</span>
+          <span class="varbox" style="min-width:60px;"><span class="vname">operand</span><span class="vval">6</span></span>
+          <span style="font-size:.8rem; color:var(--ink-600); display:block;">"+" is the operator; 5 and 6 are the operands</span>
+        </div>
+        <p>C++ classifies operators by the number of operands they need:</p>
+        <ul>
+          <li><b>Unary Operators</b> — require only one operand</li>
+          <li><b>Binary Operators</b> — require two operands</li>
+          <li><b>Ternary Operators</b> — require three operands</li>
+        </ul>
+        <p>C++ Binary Operators are further classified as: (1) Arithmetic (2) Relational (3) Logical (4) Assignment (5) Conditional.</p>
+      </div>
+
+      <div class="card">
+        <h3>(1) Arithmetic Operators <span class="label-tag textbook">Textbook</span></h3>
+        <table class="ref">
+          <tr><th>Operator</th><th>Operation</th><th>Example</th></tr>
+          <tr><td class="mono">+</td><td>Addition</td><td class="mono">10 + 5 = 15</td></tr>
+          <tr><td class="mono">-</td><td>Subtraction</td><td class="mono">10 – 5 = 5</td></tr>
+          <tr><td class="mono">*</td><td>Multiplication</td><td class="mono">10 * 5 = 50</td></tr>
+          <tr><td class="mono">/</td><td>Division (quotient)</td><td class="mono">10 / 5 = 2</td></tr>
+          <tr><td class="mono">%</td><td>Modulus (remainder)</td><td class="mono">10 % 3 = 1</td></tr>
+        </table>
+        <h4>🧪 Simulation: Arithmetic Playground <span class="difficulty diff-beginner">Beginner</span></h4>
+        <div class="field-row">
+          <input type="number" id="arA" value="10" style="width:80px;" oninput="doArith()">
+          <select id="arOp" onchange="doArith()">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+            <option value="%">%</option>
+          </select>
+          <input type="number" id="arB" value="5" style="width:80px;" oninput="doArith()">
+          <span>=</span>
+          <span id="arResult" class="varbox" style="min-width:60px;"><span class="vval">—</span></span>
+        </div>
+        <div id="arNote" class="note" style="display:none;"></div>
+
+        <h4>Increment &amp; Decrement Operators (Unary)</h4>
+        <p><code>++</code> (increment) adds 1 to its operand; <code>--</code> (decrement) subtracts 1. <code>x++</code> or <code>++x</code> is the same as <code>x = x + 1;</code>. They can appear as <b>prefix</b> (before the variable) or <b>postfix</b> (after the variable); with the prefix form, C++ performs the increment/decrement <i>before</i> using the operand.</p>
+      </div>
+
+      <div class="card">
+        <h3>(2) Relational Operators <span class="label-tag textbook">Textbook</span></h3>
+        <p>Relational operators determine the relationship between operands. The result is always a Boolean value: 1 for True, 0 for False. All six are binary operators.</p>
+        <table class="ref">
+          <tr><th>Operator</th><th>Operation</th><th>Example</th></tr>
+          <tr><td class="mono">&gt;</td><td>Greater than</td><td class="mono">a &gt; b</td></tr>
+          <tr><td class="mono">&lt;</td><td>Less than</td><td class="mono">a &lt; b</td></tr>
+          <tr><td class="mono">&gt;=</td><td>Greater than or equal to</td><td class="mono">a &gt;= b</td></tr>
+          <tr><td class="mono">&lt;=</td><td>Less than or equal to</td><td class="mono">a &lt;= b</td></tr>
+          <tr><td class="mono">==</td><td>Equal to</td><td class="mono">a == b</td></tr>
+          <tr><td class="mono">!=</td><td>Not equal</td><td class="mono">a != b</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>(3) Logical Operators <span class="label-tag textbook">Textbook</span></h3>
+        <table class="ref">
+          <tr><th>Operator</th><th>Operation</th><th>Description</th></tr>
+          <tr><td class="mono">&amp;&amp;</td><td>AND</td><td>Combines two relational expressions. Returns 1 (True) only if <i>both</i> are true, otherwise 0 (False).</td></tr>
+          <tr><td class="mono">||</td><td>OR</td><td>Combines two relational expressions. Returns 1 (True) if <i>either</i> is true; returns 0 only if both are false.</td></tr>
+          <tr><td class="mono">!</td><td>NOT</td><td>Works on a single expression — negates the truth value. (Unary; AND/OR are binary.)</td></tr>
+        </table>
+        <h4>🧪 Simulation: Logical Operator Lab <span class="difficulty diff-practice">Practice</span></h4>
+        <p style="font-size:.85rem; color:var(--ink-600);">Using the textbook's own example values: <span class="mono">a = 5, b = 6, c = 7</span>.</p>
+        <div class="chip-row">
+          <button class="btn ghost" onclick="showLogic('(a&lt;b) &amp;&amp; (b&lt;c)', (5&lt;6)&amp;&amp;(6&lt;7))">(a&lt;b) &amp;&amp; (b&lt;c)</button>
+          <button class="btn ghost" onclick="showLogic('(a&gt;b) &amp;&amp; (b&lt;c)', (5&gt;6)&amp;&amp;(6&lt;7))">(a&gt;b) &amp;&amp; (b&lt;c)</button>
+          <button class="btn ghost" onclick="showLogic('(a&lt;b) || (b&gt;c)', (5&lt;6)||(6&gt;7))">(a&lt;b) || (b&gt;c)</button>
+          <button class="btn ghost" onclick="showLogic('!(a&gt;b)', !(5&gt;6))">!(a&gt;b)</button>
+        </div>
+        <div id="logicResult" class="note" style="display:none;"></div>
+      </div>
+
+      <div class="card">
+        <h3>(4) Assignment Operator &amp; Shorthand Operators <span class="label-tag textbook">Textbook</span></h3>
+        <p><code>=</code> (equal to) is the assignment operator — it copies the value on the right side into the variable on the left side. It is a binary operator, e.g. <code>A = 32</code>. C++ also offers shorthand ("compound") assignment operators.</p>
+        <table class="ref">
+          <tr><th>Operator</th><th>Name</th><th>Example (a = 10)</th><th>Result</th></tr>
+          <tr><td class="mono">+=</td><td>Addition Assignment</td><td class="mono">c = a += 5; (a = a + 5)</td><td class="mono">c = 15</td></tr>
+          <tr><td class="mono">-=</td><td>Subtraction Assignment</td><td class="mono">c = a -= 5; (a = a – 5)</td><td class="mono">c = 5</td></tr>
+          <tr><td class="mono">*=</td><td>Multiplication Assignment</td><td class="mono">c = a *= 5; (a = a * 5)</td><td class="mono">c = 50</td></tr>
+          <tr><td class="mono">/=</td><td>Division Assignment</td><td class="mono">c = a /= 5; (a = a / 5)</td><td class="mono">c = 2</td></tr>
+          <tr><td class="mono">%=</td><td>Modulus Assignment</td><td class="mono">c = a %= 5; (a = a % 5)</td><td class="mono">c = 0</td></tr>
+        </table>
+        <div class="note exam"><b>Exam point:</b> Be ready to explain the difference between <code>=</code> (assignment) and <code>==</code> (equality comparison) — this is a textbook discussion question.</div>
+        <h4>🧪 Simulation: Shorthand Assignment <span class="difficulty diff-practice">Practice</span></h4>
+        <div class="field-row">
+          <label>a =</label><input type="number" id="saA" value="10" style="width:70px;" oninput="doShorthand()">
+          <select id="saOp" onchange="doShorthand()">
+            <option value="+=">+=</option>
+            <option value="-=">-=</option>
+            <option value="*=">*=</option>
+            <option value="/=">/=</option>
+            <option value="%=">%=</option>
+          </select>
+          <input type="number" id="saB" value="5" style="width:70px;" oninput="doShorthand()">
+          <span>→ c =</span>
+          <span id="saResult" class="varbox" style="min-width:50px;"><span class="vval">—</span></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>(5) Conditional Operator &amp; Other Operators <span class="label-tag textbook">Textbook</span></h3>
+        <p><code>?:</code> is the <b>Conditional Operator</b>, also called the <b>Ternary Operator</b> — the only one in C++. It is used as an alternative to the <code>if…else</code> control statement (studied in a later chapter).</p>
+        <table class="ref">
+          <tr><th>Operator</th><th>Purpose</th></tr>
+          <tr><td>Comma <code>,</code></td><td>Strings together several expressions, evaluated left to right.</td></tr>
+          <tr><td><code>sizeof</code></td><td>Compile-time operator; returns the size of a variable in bytes.</td></tr>
+          <tr><td><code>*</code></td><td>Pointer to a variable.</td></tr>
+          <tr><td><code>&amp;</code></td><td>Address of a variable.</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= PUNCTUATORS & PRECEDENCE ================= -->
+    <section class="panel" id="sec-punctuators">
+      <div class="eyebrow mono">9.3.5 Punctuators &amp; Precedence of Operators</div>
+      <h2>Delimiters that hold a program together</h2>
+
+      <div class="card">
+        <h3><span class="label-tag textbook">Textbook</span> Definition</h3>
+        <p>Punctuators are symbols used as delimiters while constructing a C++ program — also called <b>Separators</b>. Most are similar to C and Java.</p>
+        <table class="ref">
+          <tr><th>Separator</th><th>Description</th><th>Example</th></tr>
+          <tr><td class="mono">{ }</td><td>Curly braces mark the start/end of a block of code (a "compound statement").</td><td class="mono">int main() { int x=10,y=20,sum; sum=x+y; cout&lt;&lt;sum; }</td></tr>
+          <tr><td class="mono">( )</td><td>Parenthesis marks function calls and function parameters.</td><td class="mono">clrscr(); int main()</td></tr>
+          <tr><td class="mono">[ ]</td><td>Square brackets indicate single and multidimensional arrays.</td><td class="mono">int num[5]; char name[50];</td></tr>
+          <tr><td class="mono">,</td><td>Comma is used as a separator in an expression.</td><td class="mono">int x=10, y=20, sum;</td></tr>
+          <tr><td class="mono">.</td><td>Direct component selector.</td><td>—</td></tr>
+          <tr><td class="mono">-&gt;</td><td>Indirect component selector.</td><td>—</td></tr>
+          <tr><td class="mono">::</td><td>Scope access / resolution (class member operator).</td><td>—</td></tr>
+          <tr><td class="mono">.*</td><td>Dereference.</td><td>—</td></tr>
+          <tr><td class="mono">-&gt;*</td><td>Dereference pointer to class member.</td><td>—</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Precedence of Operators <span class="label-tag textbook">Textbook</span></h3>
+        <p>Operators execute in order of precedence. Operands and operators are grouped for evaluation in a logical way, called <b>Association</b>.</p>
+        <table class="ref">
+          <tr><th>Operators</th><th>Meaning</th><th></th></tr>
+          <tr><td class="mono">( ) [ ]</td><td>Performed first</td><td rowspan="12" style="text-align:center; writing-mode:vertical-rl; color:var(--ink-600); font-size:.75rem;">Higher → Lower</td></tr>
+          <tr><td class="mono">++ --</td><td>Postfix increment / decrement</td></tr>
+          <tr><td class="mono">++ --</td><td>Prefix increment / decrement</td></tr>
+          <tr><td class="mono">* / %</td><td>Multiplication, Division, Modulus</td></tr>
+          <tr><td class="mono">+ -</td><td>Addition, Subtraction</td></tr>
+          <tr><td class="mono">&lt; &lt;= &gt; &gt;=</td><td>Relational comparisons</td></tr>
+          <tr><td class="mono">== !=</td><td>Equal to, Not equal to</td></tr>
+          <tr><td class="mono">&amp;&amp;</td><td>Logical AND</td></tr>
+          <tr><td class="mono">||</td><td>Logical OR</td></tr>
+          <tr><td class="mono">?:</td><td>Conditional Operator</td></tr>
+          <tr><td class="mono">=</td><td>Simple Assignment</td></tr>
+          <tr><td class="mono">+= -= *= /=</td><td>Shorthand operators</td></tr>
+          <tr><td class="mono">,</td><td>Comma operator (Lowest)</td></tr>
+        </table>
+        <h4>🧪 Simulation: Precedence Quiz <span class="difficulty diff-challenge">Challenge</span></h4>
+        <p style="font-size:.85rem; color:var(--ink-600);">Use the table above to work out the result before checking.</p>
+        <div id="precQuiz"></div>
+      </div>
+    </section>
+
+    <!-- ================= PRACTICE / QUIZ ================= -->
+    <section class="panel" id="sec-practice">
+      <div class="eyebrow mono">Practice</div>
+      <h2>Quick Quiz — Tokens, Identifiers, Literals &amp; Operators</h2>
+      <p class="lede">10 questions built from the chapter content. Instant feedback, no half-marks.</p>
+      <div class="score-pill">Score: <span id="quizScore">0</span> / <span id="quizTotal">0</span></div>
+      <div id="quizArea"></div>
+      <button class="btn primary" onclick="resetQuiz()">Restart Quiz</button>
+    </section>
+
+    <!-- ================= EXAM REVISION ================= -->
+    <section class="panel" id="sec-exam">
+      <div class="eyebrow mono">Exam Preparation</div>
+      <h2>Chapter 9 — Revision Sheet</h2>
+
+      <div class="card">
+        <h3>Must Know</h3>
+        <ul>
+          <li>C++ is a <b>hybrid language</b> — supports both procedural and OOP paradigms.</li>
+          <li>C++ was developed by <b>Bjarne Stroustrup</b> at AT&amp;T Bell Laboratory in <b>1979</b>; named C++ by <b>Rick Mascitti</b> in <b>1983</b>.</li>
+          <li>A <b>Token</b> is the smallest individual unit in a program: Keywords, Identifiers, Literals, Operators, Punctuators.</li>
+          <li>Keywords must always be lowercase and cannot be used as identifiers.</li>
+          <li>Identifier rules: start with a letter/underscore; only letters, digits, underscore; case-sensitive; no keywords.</li>
+          <li>Integer constants: Decimal (0-9), Octal (0-7, starts with 0), Hexadecimal (0-9,A-F, starts with 0x/0X).</li>
+          <li>Real constants: fractional form or exponent form (Mantissa E Exponent).</li>
+          <li>String literals silently get a <code>'\0'</code> null character appended.</li>
+          <li>Operators: Unary (1 operand), Binary (2 operands), Ternary (3 operands, only <code>?:</code>).</li>
+          <li>Relational/Logical expressions evaluate to 1 (true) or 0 (false).</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Must Remember — Definitions &amp; Tables</h3>
+        <ul>
+          <li><b>Token:</b> the smallest individual unit in a program.</li>
+          <li><b>Literal/Constant:</b> a data item whose value does not change during execution.</li>
+          <li><b>Operator/Operand:</b> the symbol that performs an operation / the data it acts on.</li>
+          <li>Table 9.1 Keywords, Table 9.2 Escape Sequences, and the Precedence table are all one-mark / two-mark favourites.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Common Exam Questions <span class="label-tag textbook">From "Evaluate Yourself"</span></h3>
+        <ol>
+          <li>What is meant by literals? How many types of integer literals are available in C++?</li>
+          <li>What kind of constants are the following? (i) 26 (ii) 015 (iii) 0xF (iv) 014.9</li>
+          <li>What is a character constant in C++?</li>
+          <li>How are non-graphic characters represented in C++?</li>
+          <li>Write the following real constants into exponent form: (i) 32.179 (ii) 8.124 (iii) 0.00007</li>
+          <li>Write the following real constants in fractional form: (i) 0.23E4 (ii) 0.517E-3 (iii) 0.5E-5</li>
+          <li>What is the significance of the null (\0) character in a string?</li>
+          <li>Discuss the differences between <code>=</code> and <code>==</code> operators.</li>
+        </ol>
+        <div class="note">These are reproduced from the chapter's "Evaluate Yourself" box. Try answering them yourself using the sections above before checking a solution with your teacher/textbook — this app intentionally does not supply worked answers for these, since they are meant as self-practice.</div>
+      </div>
+
+      <div class="card">
+        <h3>One-Minute Revision</h3>
+        <p style="font-size:.92rem;">C++ = hybrid (procedural + OOP), by Stroustrup (1979), named by Mascitti (1983). A program is built from <b>Tokens</b>: <b>Keywords</b> (fixed, lowercase), <b>Identifiers</b> (your names, start with letter/underscore, no keywords), <b>Literals</b> (Decimal/Octal/Hex/Real/Character/String/Boolean — fixed values), <b>Operators</b> (Arithmetic, Relational, Logical, Assignment, Conditional — Unary/Binary/Ternary), and <b>Punctuators</b> ( <code>{ } ( ) [ ] , . -&gt; ::</code> ). Everything obeys a fixed <b>Precedence</b> order, highest to lowest: <code>() []</code> → <code>++/--</code> → <code>* / %</code> → <code>+ -</code> → relational → <code>== !=</code> → <code>&amp;&amp;</code> → <code>||</code> → <code>?:</code> → <code>=</code> → shorthand → <code>,</code>.</p>
+      </div>
+
+      <div class="card">
+        <h3>Your Progress</h3>
+        <p id="examProgressText" style="font-size:.9rem;"></p>
+        <button class="btn ghost" onclick="resetProgress()">Reset all progress</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="footer-nav">
+  <button class="btn ghost" id="btnPrev" onclick="stepSection(-1)">← Previous</button>
+  <button class="btn primary" onclick="markComplete()">Mark this section complete</button>
+  <button class="btn ghost" id="btnNext" onclick="stepSection(1)">Next →</button>
+</div>
+
+<script>
+/* ===================== DATA ===================== */
+const SECTIONS = ["overview","charset","tokens","keywords","identifiers","literals","operators","punctuators","practice","exam"];
+
+const KEYWORDS = ["asm","auto","break","case","catch","char","class","const","continue","default",
+"delete","do","double","else","enum","extern","float","for","friend","goto",
+"if","inline","int","long","new","operator","private","protected","public","register",
+"return","short","signed","sizeof","static","struct","switch","template","this","throw",
+"try","typedef","union","unsigned","virtual","void","volatile","while",
+"using","namespace","static_cast","const_cast","dynamic_cast","true","false"];
+
+/* ===================== LANGUAGE (very small demo dictionary) ===================== */
+let currentLang = 'en';
+function setLang(l){
+  currentLang = l;
+  document.getElementById('btnEn').classList.toggle('active', l==='en');
+  document.getElementById('btnTa').classList.toggle('active', l==='ta');
+  document.body.style.fontFamily = (l==='ta') ? 'var(--serif)' : 'var(--serif)';
+  const notice = l==='ta'
+    ? "குறிப்பு: இந்த கற்றல் செயலி முதன்மையாக ஆங்கிலத்தில் உள்ளது. முக்கிய கருத்துகளுக்கான தமிழ் விளக்கம் தேவைப்பட்டால், 'Overview' பகுதியில் உள்ள 'எளிய விளக்கம்' குறிப்புகளைப் பார்க்கவும். நிரலாக்க வார்த்தைகள் (if, for, int போன்றவை) எப்போதும் ஆங்கிலத்திலேயே இருக்கும்."
+    : "";
+  let bar = document.getElementById('taNotice');
+  if(l==='ta'){
+     if(!bar){
+        bar = document.createElement('div');
+        bar.id='taNotice';
+        bar.className='note';
+        bar.style.margin='16px 34px 0';
+        document.querySelector('.content').prepend(bar);
+     }
+     bar.innerText = notice;
+  } else if(bar){ bar.remove(); }
+}
+
+/* ===================== NAVIGATION ===================== */
+function goTo(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('current'));
+  document.querySelector('.nav-item[data-section="'+name+'"]').classList.add('current');
+  window.scrollTo({top:0, behavior:'smooth'});
+  updateFooterNav();
+  if(name==='exam') updateExamProgressText();
+}
+function currentIndex(){
+  const active = document.querySelector('.panel.active').id.replace('sec-','');
+  return SECTIONS.indexOf(active);
+}
+function stepSection(delta){
+  let idx = currentIndex()+delta;
+  if(idx<0) idx=0;
+  if(idx>=SECTIONS.length) idx=SECTIONS.length-1;
+  goTo(SECTIONS[idx]);
+}
+function updateFooterNav(){
+  const idx = currentIndex();
+  document.getElementById('btnPrev').disabled = idx===0;
+  document.getElementById('btnNext').disabled = idx===SECTIONS.length-1;
+}
+
+/* ===================== PROGRESS (localStorage) ===================== */
+function getProgress(){
+  try{ return JSON.parse(localStorage.getItem('cpp_ch9_progress')||'{}'); }catch(e){ return {}; }
+}
+function saveProgress(p){ localStorage.setItem('cpp_ch9_progress', JSON.stringify(p)); }
+function markComplete(){
+  const name = document.querySelector('.panel.active').id.replace('sec-','');
+  const p = getProgress();
+  p[name] = true;
+  saveProgress(p);
+  renderProgress();
+}
+function resetProgress(){
+  localStorage.removeItem('cpp_ch9_progress');
+  renderProgress();
+}
+function renderProgress(){
+  const p = getProgress();
+  let done = 0;
+  SECTIONS.forEach(s=>{
+    const item = document.querySelector('.nav-item[data-section="'+s+'"]');
+    if(!item) return;
+    const tick = item.querySelector('.tick');
+    if(p[s]){ item.classList.add('done'); tick.innerText='✓'; done++; }
+    else { item.classList.remove('done'); tick.innerText=''; }
+  });
+  document.getElementById('progressLabel').innerText = done+' / '+SECTIONS.length+' sections';
+  document.getElementById('progressBar').style.width = Math.round(done/SECTIONS.length*100)+'%';
+  updateExamProgressText();
+}
+function updateExamProgressText(){
+  const p = getProgress();
+  const done = SECTIONS.filter(s=>p[s]).length;
+  const el = document.getElementById('examProgressText');
+  if(el) el.innerText = "You have marked "+done+" of "+SECTIONS.length+" sections complete. "+(done===SECTIONS.length ? "Full chapter reviewed — nice work!" : "Keep going!");
+}
+
+/* ===================== CHARACTER CLASSIFIER ===================== */
+function classifyChar(){
+  const v = document.getElementById('charInput').value;
+  const badge = document.getElementById('charResult');
+  const ex = document.getElementById('charExplain');
+  if(v.length===0){ badge.innerText='—'; badge.className='result-badge'; ex.style.display='none'; return; }
+  const c = v;
+  let cat, msg;
+  if(/[A-Za-z]/.test(c)){ cat='Alphabet'; msg="'"+c+"' is an alphabet (A…Z or a…z)."; }
+  else if(/[0-9]/.test(c)){ cat='Numeric'; msg="'"+c+"' is a numeric character (0…9)."; }
+  else if(c===' '){ cat='White space'; msg="A blank space is a white-space character."; }
+  else if(c==='\t'){ cat='White space'; msg="A horizontal tab is a white-space character."; }
+  else if("+-*/~!@#$%^&[](){}=><_\\|?.,:'\";".indexOf(c)>=0){ cat='Special character'; msg="'"+c+"' is one of C++'s special characters."; }
+  else { cat='Other (ASCII) character'; msg="C++ can process any of the 256 ASCII characters as data."; }
+  badge.innerText = cat;
+  badge.className = 'result-badge valid';
+  ex.style.display='block';
+  ex.innerText = msg;
+}
+
+/* ===================== TOKEN CODE EXPLORER ===================== */
+const tokenMap = {
+  "int":"Keyword — a fixed word telling the compiler this is a whole-number data type.",
+  "main":"Identifier — the user/standard-named entry-point function of the program.",
+  "x":"Identifier — a variable name chosen by the programmer.",
+  "y":"Identifier — a variable name chosen by the programmer.",
+  "sum":"Identifier — a variable name chosen by the programmer.",
+  "10":"Literal (Integer constant, Decimal) — a fixed value that does not change.",
+  "20":"Literal (Integer constant, Decimal) — a fixed value that does not change.",
+  "=":"Operator (Assignment) — copies the right-hand value into the left-hand variable.",
+  "+":"Operator (Arithmetic) — adds two operands.",
+  "cout":"Identifier — the standard output stream object.",
+  "<<":"Operator (Insertion/stream operator).",
+  "(":"Punctuator — marks a function's parameter list.",
+  ")":"Punctuator — marks a function's parameter list.",
+  "{":"Punctuator — marks the start of a block of code.",
+  "}":"Punctuator — marks the end of a block of code.",
+  ",":"Punctuator — separates items in a list.",
+  ";":"Punctuator — ends a statement."
+};
+function buildTokenChips(){
+  const row = document.getElementById('tokenChips');
+  const words = ["int","main","x","10","y","20","sum","=","+","cout","<<"];
+  row.innerHTML='';
+  words.forEach(w=>{
+    const b = document.createElement('button');
+    b.className='chip';
+    b.style.cursor='pointer';
+    b.innerText=w;
+    b.onclick=()=>{
+      const ex = document.getElementById('tokenExplain');
+      ex.style.display='block';
+      ex.innerHTML = '<span class="mono" style="font-weight:700;">'+w+'</span> → '+(tokenMap[w]||'Token');
+    };
+    row.appendChild(b);
+  });
+}
+
+/* ===================== KEYWORDS ===================== */
+function buildKeywordChips(){
+  const core = KEYWORDS.slice(0,48);
+  const extra = KEYWORDS.slice(48);
+  const r1 = document.getElementById('kwChipRow');
+  const r2 = document.getElementById('kwChipRow2');
+  core.forEach(k=>{ const s=document.createElement('span'); s.className='chip kw'; s.innerText=k; r1.appendChild(s); });
+  extra.forEach(k=>{ const s=document.createElement('span'); s.className='chip kw'; s.innerText=k; r2.appendChild(s); });
+}
+function checkKeyword(){
+  const v = document.getElementById('kwInput').value.trim();
+  const badge = document.getElementById('kwResult');
+  const ex = document.getElementById('kwExplain');
+  if(v===''){ badge.innerText='—'; badge.className='result-badge'; ex.style.display='none'; return; }
+  const isKw = KEYWORDS.includes(v);
+  const isKwLower = KEYWORDS.includes(v.toLowerCase()) && !isKw;
+  badge.innerText = isKw ? 'Keyword' : 'Not a keyword';
+  badge.className = 'result-badge ' + (isKw?'invalid':'valid');
+  ex.style.display='block';
+  if(isKw) ex.innerText = "'"+v+"' is a reserved C++ keyword — it already has a fixed meaning, so it cannot be used as an identifier.";
+  else if(isKwLower) ex.innerText = "'"+v+"' is not exactly a keyword (keywords must be lowercase in C++), but '"+v.toLowerCase()+"' is reserved — using this as an identifier is risky and confusing.";
+  else ex.innerText = "'"+v+"' is free to use as an identifier (variable/function/array/class name) — it is not on the reserved list.";
+}
+
+/* ===================== IDENTIFIER VALIDATOR ===================== */
+function checkIdentifier(){
+  const v = document.getElementById('idInput').value;
+  const badge = document.getElementById('idResult');
+  const rulesList = document.getElementById('idRules');
+  rulesList.innerHTML='';
+  if(v===''){ badge.innerText='—'; badge.className='result-badge'; return; }
+  const rules = [];
+  const startsOk = /^[A-Za-z_]/.test(v);
+  rules.push([startsOk, "Starts with an alphabet or underscore"]);
+  const charsOk = /^[A-Za-z0-9_]+$/.test(v);
+  rules.push([charsOk, "Contains only alphabets, digits and underscore"]);
+  const isKeyword = KEYWORDS.includes(v);
+  rules.push([!isKeyword, "Is not a reserved keyword"]);
+  const noSpace = !/\s/.test(v);
+  rules.push([noSpace, "Contains no blank space"]);
+  let allOk = rules.every(r=>r[0]);
+  badge.innerText = allOk ? 'Valid identifier' : 'Invalid identifier';
+  badge.className = 'result-badge ' + (allOk?'valid':'invalid');
+  rules.forEach(r=>{
+    const li = document.createElement('li');
+    li.innerHTML = (r[0] ? '✅ ' : '❌ ') + r[1];
+    rulesList.appendChild(li);
+  });
+}
+
+/* ===================== LITERAL CLASSIFIER ===================== */
+function classifyLiteral(){
+  const v = document.getElementById('litInput').value.trim();
+  const badge = document.getElementById('litResult');
+  const ex = document.getElementById('litExplain');
+  if(v===''){ badge.innerText='—'; badge.className='result-badge'; ex.style.display='none'; return; }
+  let cat=null, msg='', valid=true;
+
+  if(v==='true' || v==='false'){
+    cat='Boolean literal'; msg = "'"+v+"' is a Boolean literal. Internally true = 1, false = 0.";
+  }
+  else if(/^'(.)'$/.test(v) || /^'(\\.)'$/.test(v)){
+    cat='Character constant'; msg = "A single character (or escape sequence) in single quotes — a character constant.";
+  }
+  else if(/^".*"$/.test(v)){
+    cat='String literal';
+    const inner = v.slice(1,-1);
+    msg = "A sequence of characters in double quotes — a string literal. In memory it is stored as \""+inner+"\\0\" ("+(inner.length+1)+" characters, including the null terminator).";
+  }
+  else if(/^0[xX][0-9A-Fa-f]+$/.test(v)){
+    cat='Integer constant — Hexadecimal'; msg = "Begins with 0x/0X and uses digits 0–9, A–F only.";
+  }
+  else if(/^0[xX]/.test(v)){
+    cat='Invalid'; valid=false; msg = "Looks like it is trying to be hexadecimal (starts with 0x) but contains a character outside 0–9, A–F (or a comma/decimal point), which the textbook marks invalid.";
+  }
+  else if(/^[+-]?0[0-7]+$/.test(v)){
+    cat='Integer constant — Octal'; msg = "Begins with 0 and uses digits 0–7 only.";
+  }
+  else if(/^[+-]?0[0-9]*\.[0-9]+$/.test(v)){
+    cat='Invalid (as Octal)'; valid=false; msg = "Starts with 0 but contains a decimal point — the textbook says a fractional number starting with 0 is treated as a Decimal integer (ignoring the fraction), not Octal, and a decimal point inside an explicit Octal literal is invalid.";
+  }
+  else if(/^[+-]?0[0-9]+$/.test(v)){
+    cat='Invalid (as Octal)'; valid=false; msg = "Starts with 0 but contains a digit outside 0–7 (e.g. 8 or 9), which is not a permissible octal digit.";
+  }
+  else if(/^[+-]?[0-9]+\.[0-9]+[Ee][+-]?[0-9]+$/.test(v) || /^[+-]?[0-9]+[Ee][+-]?[0-9]+$/.test(v)){
+    cat='Real constant — Exponent form'; msg = "Has a Mantissa followed by E/e and an integer Exponent.";
+  }
+  else if(/^[+-]?[0-9]+\.[0-9]+$/.test(v)){
+    cat='Real constant — Fractional form'; msg = "Has at least one digit before and after the decimal point.";
+  }
+  else if(/^[+-]?[0-9]+$/.test(v)){
+    cat='Integer constant — Decimal'; msg = "A plain sequence of digits 0–9, optionally signed.";
+  }
+  else if(/,/.test(v)){
+    cat='Invalid'; valid=false; msg = "Contains a comma — commas are not allowed inside numeric constants.";
+  }
+  else if(/\s/.test(v) && !/^".*"$/.test(v)){
+    cat='Invalid'; valid=false; msg = "Contains a blank space — blank spaces are not allowed inside numeric constants.";
+  }
+  else {
+    cat='Invalid / unrecognised'; valid=false; msg = "This does not match any literal pattern described in the textbook (Decimal, Octal, Hexadecimal, Real, Character, String or Boolean).";
+  }
+
+  badge.innerText = cat;
+  badge.className = 'result-badge ' + (valid?'valid':'invalid');
+  ex.style.display='block';
+  ex.innerText = msg;
+}
+
+/* ===================== OPERATORS: ARITHMETIC ===================== */
+function doArith(){
+  const a = parseFloat(document.getElementById('arA').value);
+  const b = parseFloat(document.getElementById('arB').value);
+  const op = document.getElementById('arOp').value;
+  const resBox = document.querySelector('#arResult .vval');
+  const note = document.getElementById('arNote');
+  if(isNaN(a) || isNaN(b)){ resBox.innerText='—'; return; }
+  let r;
+  note.style.display='none';
+  switch(op){
+    case '+': r = a+b; break;
+    case '-': r = a-b; break;
+    case '*': r = a*b; break;
+    case '/':
+      if(b===0){ resBox.innerText='ERR'; note.style.display='block'; note.innerText='Division by zero is undefined.'; return; }
+      r = Math.trunc(a/b);
+      if(a/b !== r){ note.style.display='block'; note.innerText='Integer division: '+a+' / '+b+' = '+(a/b).toFixed(3)+', but "/" gives only the quotient ('+r+') when both operands are treated as integers.'; }
+      break;
+    case '%':
+      if(b===0){ resBox.innerText='ERR'; note.style.display='block'; note.innerText='Modulus by zero is undefined.'; return; }
+      r = a % b; break;
+  }
+  resBox.innerText = r;
+}
+function showLogic(expr, result){
+  const box = document.getElementById('logicResult');
+  box.style.display='block';
+  box.innerHTML = '<span class="mono" style="font-weight:700;">'+expr.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&')+'</span> → <b>'+(result?1:0)+' ('+(result?'True':'False')+')</b>';
+}
+function doShorthand(){
+  const a = parseFloat(document.getElementById('saA').value);
+  const b = parseFloat(document.getElementById('saB').value);
+  const op = document.getElementById('saOp').value;
+  const resBox = document.querySelector('#saResult .vval');
+  if(isNaN(a)||isNaN(b)){ resBox.innerText='—'; return; }
+  let r;
+  switch(op){
+    case '+=': r=a+b; break;
+    case '-=': r=a-b; break;
+    case '*=': r=a*b; break;
+    case '/=': r = b===0?'ERR':Math.trunc(a/b); break;
+    case '%=': r = b===0?'ERR':(a%b); break;
+  }
+  resBox.innerText = r;
+}
+
+/* ===================== PRECEDENCE QUIZ ===================== */
+const precQuestions = [
+  {expr:"3 + 4 * 2", opts:["14","11","20","9"], ans:"11", why:"* has higher precedence than +, so 4*2=8 first, then 3+8=11."},
+  {expr:"(3 + 4) * 2", opts:["14","11","20","9"], ans:"14", why:"Parenthesis is performed first: (3+4)=7, then 7*2=14."},
+  {expr:"10 % 3 + 1", opts:["1","2","4","0"], ans:"2", why:"% has higher precedence than +: 10%3=1, then 1+1=2."},
+  {expr:"5 > 3 && 2 > 4", opts:["1 (True)","0 (False)","5","Error"], ans:"0 (False)", why:"Relational (>) is evaluated before &&: (5>3)=1, (2>4)=0, so 1 && 0 = 0."}
+];
+function buildPrecQuiz(){
+  const wrap = document.getElementById('precQuiz');
+  wrap.innerHTML='';
+  precQuestions.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className='quiz-q';
+    div.innerHTML = '<b class="mono">Expression '+(i+1)+':</b> <span class="mono">'+q.expr+'</span><div class="quiz-opts" id="pq'+i+'"></div><div class="quiz-feedback" id="pf'+i+'"></div>';
+    wrap.appendChild(div);
+    const optWrap = div.querySelector('#pq'+i);
+    q.opts.forEach(o=>{
+      const b = document.createElement('button');
+      b.className='quiz-opt';
+      b.innerText=o;
+      b.onclick=()=>{
+        const fb = document.getElementById('pf'+i);
+        optWrap.querySelectorAll('.quiz-opt').forEach(x=>x.classList.remove('correct','wrong'));
+        if(o===q.ans){ b.classList.add('correct'); fb.innerHTML='🎉 Correct! '+q.why; }
+        else { b.classList.add('wrong'); optWrap.querySelectorAll('.quiz-opt').forEach(x=>{ if(x.innerText===q.ans) x.classList.add('correct'); }); fb.innerHTML='Not quite — '+q.why; }
+      };
+      optWrap.appendChild(b);
+    });
+  });
+}
+
+/* ===================== MAIN QUIZ ===================== */
+const quizQuestions = [
+  {q:"What is the smallest individual unit in a C++ program called?", opts:["Statement","Token","Function","Header"], ans:"Token"},
+  {q:"Which of these must always be written in lowercase in C++?", opts:["Identifiers","String literals","Keywords","Comments"], ans:"Keywords"},
+  {q:"Which identifier is INVALID and why?", opts:["total_sales","tamilMark","2myfile","_add"], ans:"2myfile"},
+  {q:"'012' (starting with 0, digits 0-7) is an example of which literal type?", opts:["Decimal","Octal","Hexadecimal","Real"], ans:"Octal"},
+  {q:"Which of these is a valid Hexadecimal constant?", opts:["0x1,A5","0X568","0x.14E","0xG12"], ans:"0X568"},
+  {q:"How many operands does a Unary operator require?", opts:["1","2","3","0"], ans:"1"},
+  {q:"What does the expression (a<b) && (b<c) return when a=5, b=6, c=7?", opts:["0","1","-1","Error"], ans:"1"},
+  {q:"Given a=10, what is c after: c = a += 5;", opts:["10","5","15","50"], ans:"15"},
+  {q:"Which punctuator marks the start and end of a block of code?", opts:["( )","[ ]","{ }",", "], ans:"{ }"},
+  {q:"In the precedence table, which group is evaluated LAST?", opts:["( ) [ ]","Comma operator","* / %","&& "], ans:"Comma operator"}
+];
+let quizState = {};
+function buildQuiz(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML='';
+  quizState = {answered:{}, correct:0};
+  document.getElementById('quizTotal').innerText = quizQuestions.length;
+  quizQuestions.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className='quiz-q';
+    const shuffled = [...q.opts];
+    div.innerHTML = '<b>Q'+(i+1)+'.</b> '+q.q+'<div class="quiz-opts" id="mq'+i+'"></div><div class="quiz-feedback" id="mf'+i+'"></div>';
+    area.appendChild(div);
+    const optWrap = div.querySelector('#mq'+i);
+    shuffled.forEach(o=>{
+      const b = document.createElement('button');
+      b.className='quiz-opt';
+      b.innerText=o;
+      b.onclick=()=>{
+        if(quizState.answered[i]) return;
+        quizState.answered[i]=true;
+        const fb = document.getElementById('mf'+i);
+        optWrap.querySelectorAll('.quiz-opt').forEach(x=>x.classList.remove('correct','wrong'));
+        if(o===q.ans){ b.classList.add('correct'); fb.innerHTML='🎉 Correct!'; quizState.correct++; }
+        else { b.classList.add('wrong'); optWrap.querySelectorAll('.quiz-opt').forEach(x=>{ if(x.innerText===q.ans) x.classList.add('correct'); }); fb.innerHTML='Not quite — the correct answer is "'+q.ans+'".'; }
+        document.getElementById('quizScore').innerText = quizState.correct;
+      };
+      optWrap.appendChild(b);
+    });
+  });
+  document.getElementById('quizScore').innerText = 0;
+}
+function resetQuiz(){ buildQuiz(); }
+
+/* ===================== INIT ===================== */
+window.onload = function(){
+  buildTokenChips();
+  buildKeywordChips();
+  buildPrecQuiz();
+  buildQuiz();
+  renderProgress();
+  updateFooterNav();
+};
+</script>
+</body>
+</html>

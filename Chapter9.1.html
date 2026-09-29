@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ Learning Lab — Data Types, Variables &amp; Expressions</title>
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg: #0F1417;
+  --surface: #141B1F;
+  --card: #1A2226;
+  --card-2: #1F292E;
+  --border: #2A353B;
+  --text: #E8EDEF;
+  --text-dim: #9AA7AC;
+  --text-faint: #647177;
+  --teal: #4FD1C5;
+  --teal-dim: #2C6E68;
+  --amber: #F2B84B;
+  --amber-dim: #6B5327;
+  --violet: #A99BFF;
+  --red: #F27C6B;
+  --green: #7FD48A;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.6;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+@font-face{ font-family:'Space Grotesk'; src:local('Space Grotesk'); }
+::selection{ background:var(--teal-dim); color:var(--text); }
+
+/* ============ LAYOUT SHELL ============ */
+.app{ display:flex; min-height:100vh; }
+
+/* SIDEBAR */
+.sidebar{
+  width:280px; flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:20px 16px 100px;
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+}
+.brand{ padding:6px 8px 20px; border-bottom:1px solid var(--border); margin-bottom:16px;}
+.brand .mark{
+  font-family:var(--font-display); font-weight:700; font-size:1.05rem; color:var(--teal);
+  letter-spacing:0.3px;
+}
+.brand .sub{ font-size:0.75rem; color:var(--text-faint); margin-top:2px;}
+
+.progress-block{ padding:10px 8px 18px; border-bottom:1px solid var(--border); margin-bottom:14px;}
+.progress-label{ display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-dim); margin-bottom:6px;}
+.progress-track{ height:6px; border-radius:3px; background:var(--card-2); overflow:hidden;}
+.progress-fill{ height:100%; background:linear-gradient(90deg,var(--teal),var(--violet)); width:0%; transition:width .4s ease;}
+
+.nav-group-title{ font-size:0.68rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-faint); padding:14px 8px 6px;}
+.nav-item{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 10px; border-radius:8px; cursor:pointer;
+  color:var(--text-dim); font-size:0.88rem; transition:background .15s, color .15s;
+  border:1px solid transparent;
+}
+.nav-item:hover{ background:var(--card); color:var(--text);}
+.nav-item.active{ background:var(--card-2); color:var(--teal); border-color:var(--teal-dim);}
+.nav-check{ width:16px; height:16px; border-radius:50%; border:1.5px solid var(--text-faint); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.6rem;}
+.nav-check.done{ background:var(--teal); border-color:var(--teal); color:#0B0F11;}
+
+.lang-toggle{ display:flex; gap:6px; padding:10px 8px 4px;}
+.lang-btn{
+  flex:1; padding:7px 4px; border-radius:7px; border:1px solid var(--border);
+  background:var(--card); color:var(--text-dim); font-size:0.78rem; cursor:pointer; font-family:var(--font-body);
+}
+.lang-btn.active{ background:var(--teal); color:#0B0F11; border-color:var(--teal); font-weight:600;}
+
+/* MAIN */
+.main{ flex:1; min-width:0; }
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:rgba(15,20,23,0.92); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+  padding:16px 40px;
+}
+.topbar h1{ font-family:var(--font-display); font-size:1.15rem; font-weight:600;}
+.topbar .crumb{ font-size:0.78rem; color:var(--text-faint); margin-top:2px;}
+
+.content{ padding:36px 40px 100px; max-width:880px; }
+section.panel{ display:none; }
+section.panel.active{ display:block; animation:fadein .35s ease; }
+@keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+.eyebrow{ font-size:0.72rem; color:var(--teal); letter-spacing:0.5px; margin-bottom:6px; font-family:var(--font-mono); }
+h2.title{ font-family:var(--font-display); font-size:1.9rem; font-weight:700; margin-bottom:10px; line-height:1.2;}
+p.lead{ color:var(--text-dim); font-size:1.02rem; max-width:65ch; margin-bottom:26px;}
+
+h3.sub{ font-family:var(--font-display); font-size:1.25rem; font-weight:600; margin:34px 0 12px; padding-top:8px; border-top:1px solid var(--border);}
+h3.sub:first-of-type{ border-top:none; padding-top:0;}
+h4.mini{ font-family:var(--font-display); font-size:1.02rem; font-weight:600; margin:20px 0 8px; color:var(--teal);}
+
+p{ margin-bottom:14px; color:var(--text); max-width:70ch; }
+p.muted{ color:var(--text-dim); }
+
+/* CARDS */
+.card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:18px;}
+.card-title{ font-family:var(--font-display); font-weight:600; font-size:0.95rem; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+
+.tag{ display:inline-block; font-family:var(--font-mono); font-size:0.68rem; padding:3px 9px; border-radius:20px; letter-spacing:0.3px; }
+.tag.textbook{ background:var(--teal-dim); color:var(--teal); }
+.tag.easy{ background:#2C3A2E; color:var(--green); }
+.tag.example{ background:#3A2F1D; color:var(--amber); }
+.tag.activity{ background:#2C2740; color:var(--violet); }
+.tag.improved{ background:#3A2020; color:var(--red); }
+
+/* CODE */
+pre.code{
+  background:#0B1013; border:1px solid var(--border); border-radius:10px;
+  padding:16px 18px; overflow-x:auto; font-family:var(--font-mono); font-size:0.86rem;
+  line-height:1.65; margin:10px 0 16px; color:#D7E0E2;
+}
+pre.code .kw{ color:#7FA8FF; } pre.code .type{ color:#4FD1C5;} pre.code .str{ color:#F2B84B;}
+pre.code .cm{ color:#647177; font-style:italic;}
+pre.code .fn{ color:#A99BFF;}
+code.inline{ font-family:var(--font-mono); background:var(--card-2); padding:2px 6px; border-radius:5px; font-size:0.88em; color:var(--teal);}
+
+.output-box{
+  background:#08110E; border:1px solid #1E3A2E; border-radius:10px; padding:14px 18px;
+  font-family:var(--font-mono); font-size:0.85rem; color:#9FE6B0; margin:10px 0 16px; white-space:pre-line;
+}
+.output-box::before{ content:"OUTPUT"; display:block; font-size:0.62rem; letter-spacing:1px; color:#4E9C68; margin-bottom:8px;}
+
+/* TABLES */
+table.data-table{ width:100%; border-collapse:collapse; margin:14px 0 20px; font-size:0.88rem;}
+table.data-table th, table.data-table td{ padding:9px 12px; border:1px solid var(--border); text-align:left;}
+table.data-table th{ background:var(--card-2); font-family:var(--font-display); font-weight:600; color:var(--teal); font-size:0.8rem;}
+table.data-table td{ color:var(--text-dim);}
+table.data-table tr:hover td{ background:rgba(79,209,197,0.04); color:var(--text);}
+
+/* GRID */
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media(max-width:720px){ .grid-2{ grid-template-columns:1fr; } }
+
+/* BUTTONS */
+.btn{
+  font-family:var(--font-body); font-size:0.85rem; font-weight:600; padding:9px 16px; border-radius:8px;
+  border:1px solid var(--border); background:var(--card-2); color:var(--text); cursor:pointer; transition:all .15s;
+}
+.btn:hover{ border-color:var(--teal); color:var(--teal); }
+.btn.primary{ background:var(--teal); color:#0B0F11; border-color:var(--teal);}
+.btn.primary:hover{ opacity:0.88; color:#0B0F11;}
+.btn.ghost{ background:transparent;}
+.btn:disabled{ opacity:0.4; cursor:not-allowed;}
+.btn-row{ display:flex; gap:10px; flex-wrap:wrap; margin:14px 0;}
+
+/* MEMORY BOXES */
+.mem-row{ display:flex; gap:10px; flex-wrap:wrap; margin:16px 0;}
+.mem-box{
+  min-width:96px; border:1.5px solid var(--border); border-radius:10px; overflow:hidden;
+  background:var(--card-2); transition:border-color .3s, box-shadow .3s;
+}
+.mem-box.flash{ border-color:var(--teal); box-shadow:0 0 0 3px rgba(79,209,197,0.15); }
+.mem-box .mb-head{ padding:6px 10px; font-family:var(--font-mono); font-size:0.7rem; color:var(--text-faint); background:var(--card); border-bottom:1px solid var(--border);}
+.mem-box .mb-val{ padding:14px 10px; text-align:center; font-family:var(--font-mono); font-size:1.1rem; color:var(--teal); font-weight:600;}
+.mem-box .mb-addr{ padding:5px 10px; text-align:center; font-family:var(--font-mono); font-size:0.65rem; color:var(--text-faint); border-top:1px solid var(--border);}
+.mem-box.junk .mb-val{ color:var(--red); font-size:0.75rem;}
+
+/* SIM SHELL */
+.sim{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:22px; margin:18px 0 26px;}
+.sim-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;}
+.sim-head .name{ font-family:var(--font-display); font-weight:600; font-size:0.95rem;}
+.step-indicator{ font-family:var(--font-mono); font-size:0.75rem; color:var(--text-faint);}
+.sim-explain{
+  background:var(--card-2); border-left:3px solid var(--teal); padding:10px 14px; border-radius:0 8px 8px 0;
+  font-size:0.86rem; color:var(--text-dim); margin-top:12px; min-height:20px;
+}
+.sim-explain b{ color:var(--teal); }
+.line-hl{ background:rgba(79,209,197,0.14); border-radius:4px; }
+
+/* INTERACTIVE INPUT */
+.field-inline{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0;}
+.field-inline input[type=text], .field-inline input[type=number]{
+  background:#0B1013; border:1px solid var(--border); color:var(--text); padding:7px 10px; border-radius:7px;
+  font-family:var(--font-mono); font-size:0.85rem; width:110px;
+}
+.field-inline label{ font-size:0.8rem; color:var(--text-dim);}
+
+/* QUIZ */
+.quiz-card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:16px;}
+.quiz-q{ font-weight:600; margin-bottom:12px; font-size:0.98rem;}
+.quiz-opts{ display:flex; flex-direction:column; gap:8px;}
+.opt-btn{
+  text-align:left; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--card-2);
+  color:var(--text); cursor:pointer; font-family:var(--font-mono); font-size:0.85rem; transition:all .15s;
+}
+.opt-btn:hover{ border-color:var(--teal);}
+.opt-btn.correct{ border-color:var(--green); background:rgba(127,212,138,0.1); color:var(--green);}
+.opt-btn.wrong{ border-color:var(--red); background:rgba(242,124,107,0.1); color:var(--red);}
+.opt-btn:disabled{ cursor:default;}
+.feedback{ margin-top:12px; font-size:0.86rem; padding:10px 14px; border-radius:8px; display:none;}
+.feedback.show{ display:block; }
+.feedback.ok{ background:rgba(127,212,138,0.08); color:var(--green); border:1px solid rgba(127,212,138,0.3);}
+.feedback.no{ background:rgba(242,124,107,0.08); color:var(--red); border:1px solid rgba(242,124,107,0.3);}
+
+/* DEBUG LAB */
+.err-block{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;}
+@media(max-width:720px){ .err-block{ grid-template-columns:1fr;} }
+.err-col{ padding:14px; border-radius:10px; border:1px solid var(--border);}
+.err-col.bad{ background:rgba(242,124,107,0.06); border-color:rgba(242,124,107,0.25);}
+.err-col.good{ background:rgba(127,212,138,0.06); border-color:rgba(127,212,138,0.25);}
+.err-col h5{ font-family:var(--font-mono); font-size:0.75rem; margin-bottom:8px;}
+.err-col.bad h5{ color:var(--red);} .err-col.good h5{ color:var(--green);}
+
+/* FOOTER NAV */
+.panel-nav{ display:flex; justify-content:space-between; align-items:center; margin-top:44px; padding-top:20px; border-top:1px solid var(--border);}
+.panel-nav .spacer{ flex:1;}
+
+/* CONCEPT MAP */
+.cmap{ display:flex; flex-direction:column; gap:0; align-items:flex-start; margin:20px 0;}
+.cmap-node{
+  background:var(--card-2); border:1px solid var(--border); border-radius:8px; padding:9px 16px;
+  font-family:var(--font-mono); font-size:0.82rem; color:var(--teal); position:relative;
+}
+.cmap-arrow{ color:var(--text-faint); font-size:0.9rem; padding:2px 0 2px 22px; font-family:var(--font-mono);}
+
+/* TOOLTIP-ish note */
+.note{ background:rgba(242,184,75,0.08); border:1px solid rgba(242,184,75,0.3); border-radius:8px; padding:12px 16px; font-size:0.86rem; color:var(--amber); margin:14px 0;}
+.exam-point{ background:rgba(169,155,255,0.08); border:1px solid rgba(169,155,255,0.3); border-radius:8px; padding:12px 16px; font-size:0.86rem; color:var(--violet); margin:14px 0;}
+.exam-point b{ color:var(--violet);}
+
+ul.plain{ margin:0 0 16px 20px; color:var(--text-dim);}
+ul.plain li{ margin-bottom:6px;}
+
+.tamil{ display:none; }
+[data-lang="ta"] .tamil{ display:block; }
+[data-lang="ta"] .english{ display:none; }
+.tamil{ color:var(--text-dim); font-size:0.94rem; }
+
+@media(max-width:900px){
+  .sidebar{ position:fixed; left:-300px; z-index:50; transition:left .25s; box-shadow:20px 0 40px rgba(0,0,0,0.4);}
+  .sidebar.open{ left:0; }
+  .content{ padding:26px 18px 100px;}
+  .topbar{ padding:14px 18px; display:flex; align-items:center; gap:12px;}
+  .menu-btn{ background:var(--card); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:8px 10px; cursor:pointer;}
+}
+.menu-btn{ display:none; }
+@media(max-width:900px){ .menu-btn{ display:block; } }
+</style>
+</head>
+<body data-lang="en">
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="mark">C++ Learning Lab</div>
+      <div class="sub">Class 11 · Tamil Nadu State Board</div>
+    </div>
+
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btnEn" onclick="setLang('en')">English</button>
+      <button class="lang-btn" id="btnTa" onclick="setLang('ta')">தமிழ்</button>
+    </div>
+
+    <div class="progress-block">
+      <div class="progress-label"><span>Chapter progress</span><span id="progressPct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="nav-group-title">Chapter 9</div>
+    <div class="nav-item" data-target="p-intro" onclick="go('p-intro')"><span class="nav-check" id="chk-p-intro">○</span><span>Introduction &amp; Concept Map</span></div>
+    <div class="nav-item" data-target="p-datatypes" onclick="go('p-datatypes')"><span class="nav-check" id="chk-p-datatypes">○</span><span>Fundamental Data Types</span></div>
+    <div class="nav-item" data-target="p-memory" onclick="go('p-memory')"><span class="nav-check" id="chk-p-memory">○</span><span>Memory &amp; Modifiers</span></div>
+    <div class="nav-item" data-target="p-variables" onclick="go('p-variables')"><span class="nav-check" id="chk-p-variables">○</span><span>Variables</span></div>
+    <div class="nav-item" data-target="p-init" onclick="go('p-init')"><span class="nav-check" id="chk-p-init">○</span><span>Initialization</span></div>
+    <div class="nav-item" data-target="p-constref" onclick="go('p-constref')"><span class="nav-check" id="chk-p-constref">○</span><span>const &amp; References</span></div>
+    <div class="nav-item" data-target="p-format" onclick="go('p-format')"><span class="nav-check" id="chk-p-format">○</span><span>Formatting Output</span></div>
+    <div class="nav-item" data-target="p-expr" onclick="go('p-expr')"><span class="nav-check" id="chk-p-expr">○</span><span>Expressions</span></div>
+    <div class="nav-item" data-target="p-conv" onclick="go('p-conv')"><span class="nav-check" id="chk-p-conv">○</span><span>Type Conversion</span></div>
+    <div class="nav-item" data-target="p-debug" onclick="go('p-debug')"><span class="nav-check" id="chk-p-debug">○</span><span>Debugging Lab</span></div>
+    <div class="nav-item" data-target="p-quiz" onclick="go('p-quiz')"><span class="nav-check" id="chk-p-quiz">○</span><span>Quick Quiz</span></div>
+    <div class="nav-item" data-target="p-exam" onclick="go('p-exam')"><span class="nav-check" id="chk-p-exam">○</span><span>Exam Preparation</span></div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar">
+      <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <div>
+        <h1 id="topTitle">Introduction &amp; Concept Map</h1>
+        <div class="crumb">Chapter 9 · Data Types, Variables and Expressions</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ================= INTRO ================= -->
+      <section class="panel active" id="p-intro">
+        <div class="eyebrow">CHAPTER 9 · SECTION 9.10</div>
+        <h2 class="title english">Data Types, Variables and Expressions</h2>
+        <h2 class="title tamil">தரவு வகைகள், மாறிகள் மற்றும் கோவைகள்</h2>
+        <p class="lead english">Every C++ program works with data. Before the computer can store or process any piece of data, it needs to know exactly what <em>kind</em> of data it is dealing with. This chapter builds that foundation — data types, variables, formatted output, expressions and type conversion.</p>
+        <p class="lead tamil">ஒவ்வொரு C++ நிரலும் தரவுகளுடன் செயல்படுகிறது. கணினி ஒரு தரவை சேமிக்கும் முன், அது எந்த வகையான தரவு என்பதை தெளிவாக தெரிந்து கொள்ள வேண்டும். இந்த அத்தியாயம் தரவு வகைகள், மாறிகள், வடிவமைக்கப்பட்ட வெளியீடு, கோவைகள் மற்றும் வகை மாற்றம் பற்றி விளக்குகிறது.</p>
+
+        <div class="card">
+          <div class="card-title"><span class="tag textbook">Textbook</span> Why data types matter</div>
+          <p class="english">Every programming language has two fundamental elements: data types and variables. C++ provides a predefined set of data types for handling data items — these are called <b>fundamental or built-in data types</b>. A programmer can also create <b>user-defined data types</b>.</p>
+          <p class="tamil">ஒவ்வொரு நிரலாக்க மொழிக்கும் இரண்டு அடிப்படை கூறுகள் உள்ளன: தரவு வகைகள் மற்றும் மாறிகள். C++ தரவு உருப்படிகளை கையாள முன்பே வரையறுக்கப்பட்ட தரவு வகைகளை வழங்குகிறது — இவை <b>அடிப்படை (built-in) தரவு வகைகள்</b> எனப்படும். நிரலாளர் <b>பயனர் வரையறுத்த தரவு வகைகளையும்</b> உருவாக்கலாம்.</p>
+          <p class="muted english" style="font-size:0.85rem;">Example from the text: <code class="inline">Name = Ram</code>, <code class="inline">Age = 15</code>, <code class="inline">Average_Mark = 85.6</code> — each value is a different "kind" of data: text, a whole number, and a fractional number.</p>
+        </div>
+
+        <h3 class="sub english">Learning Goals</h3>
+        <h3 class="sub tamil">கற்றல் இலக்குகள்</h3>
+        <ul class="plain english">
+          <li>Explain the three categories of C++ data types</li>
+          <li>Identify the five fundamental data types and their memory sizes</li>
+          <li>Declare, initialize and use variables correctly</li>
+          <li>Use manipulators (<code class="inline">endl</code>, <code class="inline">setw</code>, <code class="inline">setprecision</code>) to format output</li>
+          <li>Classify expressions and understand implicit &amp; explicit type conversion</li>
+        </ul>
+        <ul class="plain tamil">
+          <li>C++ தரவு வகைகளின் மூன்று வகைகளை விளக்குதல்</li>
+          <li>ஐந்து அடிப்படை தரவு வகைகள் மற்றும் அவற்றின் நினைவக அளவுகளை அடையாளம் காணுதல்</li>
+          <li>மாறிகளை சரியாக அறிவித்து, துவக்கி பயன்படுத்துதல்</li>
+          <li><code class="inline">endl</code>, <code class="inline">setw</code>, <code class="inline">setprecision</code> ஆகியவற்றைப் பயன்படுத்தி வெளியீட்டை வடிவமைத்தல்</li>
+          <li>கோவைகளை வகைப்படுத்துதல் மற்றும் தன்னிச்சை &amp; வெளிப்படையான வகை மாற்றத்தைப் புரிந்துகொள்ளுதல்</li>
+        </ul>
+
+        <h3 class="sub english">Concept Map</h3>
+        <h3 class="sub tamil">கருத்து வரைபடம்</h3>
+        <p class="muted english">This is a learning-path built from the topics that actually appear in the chapter — each concept needs the one above it.</p>
+        <div class="card">
+          <div class="cmap" id="cmap"></div>
+        </div>
+
+        <div class="panel-nav"><div class="spacer"></div><button class="btn primary" onclick="go('p-datatypes')">Start: Fundamental Data Types →</button></div>
+      </section>
+
+      <!-- ================= DATA TYPES ================= -->
+      <section class="panel" id="p-datatypes">
+        <div class="eyebrow">SECTION 9.12</div>
+        <h2 class="title">C++ Data Types</h2>
+        <p class="lead">In C++, data types are classified into three main categories. This chapter focuses only on the <b>fundamental (built-in)</b> types.</p>
+
+        <div class="grid-2">
+          <div class="card"><div class="card-title"><span class="tag textbook">Textbook</span>Three categories</div>
+            <ul class="plain">
+              <li><b>Fundamental data types</b> — int, char, float, double, void</li>
+              <li><b>User-defined data types</b> — structure, union, class, enumeration</li>
+              <li><b>Derived data types</b> — array, function, pointer, reference</li>
+            </ul>
+          </div>
+          <div class="card"><div class="card-title"><span class="tag easy">Easy explanation</span>Think of it like sorting containers</div>
+            <p style="margin:0;">A data type tells the computer what kind of container to use in memory — a small box for a whole number, a slightly bigger one for a character, and a wider box for numbers with decimals.</p>
+          </div>
+        </div>
+
+        <h3 class="sub">The five fundamental data types</h3>
+        <table class="data-table">
+          <tr><th>Type</th><th>What it stores</th><th>Textbook note</th></tr>
+          <tr><td><code class="inline">int</code></td><td>Whole (integer) numbers only</td><td>If you store a fractional value, only the integer part is kept — the fraction is ignored.</td></tr>
+          <tr><td><code class="inline">char</code></td><td>A single valid ASCII character</td><td>Often called an integer type too, since characters are stored as their ASCII code.</td></tr>
+          <tr><td><code class="inline">float</code></td><td>Floating point (decimal) values</td><td>Can represent values between integers and a much greater range — but is slower than int.</td></tr>
+          <tr><td><code class="inline">double</code></td><td>Double-precision floating point</td><td>Occupies double the space of float — more fractional digits, larger and slower than float.</td></tr>
+          <tr><td><code class="inline">void</code></td><td>An empty set of values</td><td>Used as a return type for functions that return nothing.</td></tr>
+        </table>
+
+        <h3 class="sub">int — Simulation: storing a fractional value</h3>
+        <p class="muted">Try storing a value with a decimal point in an <code class="inline">int</code> variable and watch what actually gets kept.</p>
+        <div class="sim">
+          <div class="sim-head"><span class="name">int truncation simulator</span></div>
+          <pre class="code"><span class="type">int</span> num = <span id="intInputDisplay">12</span>;</pre>
+          <div class="field-inline">
+            <label>Try a value:</label>
+            <input type="text" id="intSimInput" value="12.9" />
+            <button class="btn primary" onclick="runIntSim()">Store it</button>
+          </div>
+          <div class="mem-row">
+            <div class="mem-box" id="intSimBox">
+              <div class="mb-head">num (int)</div>
+              <div class="mb-val" id="intSimVal">—</div>
+              <div class="mb-addr">2 bytes</div>
+            </div>
+          </div>
+          <div class="sim-explain" id="intSimExplain">Enter a number above and click "Store it" to see how <code class="inline">int</code> handles it.</div>
+        </div>
+
+        <h3 class="sub">char — Two textbook illustrations</h3>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><span class="tag textbook">Illustration</span>Example 1 — display a character</div>
+            <pre class="code"><span class="type">char</span> ch=<span class="str">'A'</span>;
+cout&lt;&lt;ch;</pre>
+            <div class="output-box">A</div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="tag textbook">Illustration</span>Example 2 — arithmetic on a char</div>
+            <pre class="code"><span class="type">char</span> ch=<span class="str">'A'</span>;
+ch=ch+1;
+cout&lt;&lt;ch;</pre>
+            <div class="output-box">B</div>
+            <p class="muted" style="font-size:0.83rem;margin:0;">ch is incremented by 1 using its ASCII code, and the new value is stored back in ch.</p>
+          </div>
+        </div>
+
+        <h3 class="sub">Illustration 9.3 — int and char working together</h3>
+        <p class="muted">Step through this textbook program to see exactly how the ASCII code entered by the user becomes a character.</p>
+        <div class="sim">
+          <div class="sim-head">
+            <span class="name">ASCII ↔ char stepper</span>
+            <span class="step-indicator" id="asciiStepLabel">Step 0 / 4</span>
+          </div>
+          <pre class="code" id="asciiCode"><span class="cm">#include &lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+<span class="type">int</span> <span class="fn">main</span> ()
+{
+<span data-line="0"><span class="type">int</span> n;</span>
+<span data-line="1"><span class="type">char</span> ch;</span>
+<span data-line="2">cout &lt;&lt; <span class="str">"Enter an ASCII code (0 to 255): "</span>;</span>
+<span data-line="3">cin &gt;&gt; n;</span>
+<span data-line="4">ch = n;</span>
+<span data-line="5">cout &lt;&lt; <span class="str">"Equivalent Character: "</span> &lt;&lt; ch;</span>
+}</pre>
+          <div class="field-inline">
+            <label>ASCII code entered by user:</label>
+            <input type="number" id="asciiInput" value="100" min="0" max="255"/>
+          </div>
+          <div class="mem-row">
+            <div class="mem-box" id="asciiBoxN"><div class="mb-head">n (int)</div><div class="mb-val" id="asciiValN">?</div><div class="mb-addr">2 bytes</div></div>
+            <div class="mem-box" id="asciiBoxCh"><div class="mb-head">ch (char)</div><div class="mb-val" id="asciiValCh">?</div><div class="mb-addr">1 byte</div></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn primary" onclick="asciiStep()">Next step ▶</button>
+            <button class="btn" onclick="asciiReset()">Reset ↺</button>
+          </div>
+          <div class="sim-explain" id="asciiExplain">Click "Next step" to begin execution.</div>
+        </div>
+
+        <div class="exam-point"><b>Exam point:</b> char is stored as an integer (ASCII) internally — that is exactly why <code class="inline">ch = n;</code> works even though n is an int and ch is a char.</div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-intro')">← Back</button><button class="btn primary" onclick="go('p-memory')">Next: Memory &amp; Modifiers →</button></div>
+      </section>
+
+      <!-- ================= MEMORY & MODIFIERS ================= -->
+      <section class="panel" id="p-memory">
+        <div class="eyebrow">SECTION 9.12.2 – 9.12.3</div>
+        <h2 class="title">Memory Representation &amp; Modifiers</h2>
+        <p class="lead">Every data type is allocated a fixed amount of memory. Modifiers let a programmer expand or shrink that allocation.</p>
+
+        <h3 class="sub">Table 9.5 — Memory allocation for fundamental data types</h3>
+        <table class="data-table">
+          <tr><th>Data type</th><th>Space (bytes)</th><th>Space (bits)</th><th>Range</th></tr>
+          <tr><td><code class="inline">char</code></td><td>1 byte</td><td>8 bits</td><td>-128 to 127</td></tr>
+          <tr><td><code class="inline">int</code></td><td>2 bytes</td><td>16 bits</td><td>-32,768 to 32,767</td></tr>
+          <tr><td><code class="inline">float</code></td><td>4 bytes</td><td>32 bits</td><td>3.4×10⁻³⁸ to 3.4×10³⁸-1</td></tr>
+          <tr><td><code class="inline">double</code></td><td>8 bytes</td><td>64 bits</td><td>1.7×10⁻³⁰⁸ to 1.7×10³⁰⁸-1</td></tr>
+        </table>
+        <p class="muted" style="font-size:0.85rem;">These figures are per the Turbo C++ compiler. Dev C++ gives more space to <code class="inline">int</code> (4 bytes) and <code class="inline">long double</code> (12 bytes) — see Table 9.9 below.</p>
+
+        <h3 class="sub">Data type modifiers</h3>
+        <p>Modifiers change (expand or reduce) the memory a fundamental type occupies. There are four: <code class="inline">signed</code>, <code class="inline">unsigned</code>, <code class="inline">long</code>, <code class="inline">short</code>. They apply to any fundamental type <b>except void</b>.</p>
+
+        <h4 class="mini">Table 9.6 — Integer type modifiers</h4>
+        <table class="data-table">
+          <tr><th>Data type</th><th>Bytes</th><th>Bits</th><th>Range</th></tr>
+          <tr><td>short</td><td>2</td><td>16</td><td>-32,768 to 32,767</td></tr>
+          <tr><td>unsigned short</td><td>2</td><td>16</td><td>0 to 65,535</td></tr>
+          <tr><td>signed short</td><td>2</td><td>16</td><td>-32,768 to 32,767</td></tr>
+          <tr><td>int</td><td>2</td><td>16</td><td>-32,768 to 32,767</td></tr>
+          <tr><td>unsigned int</td><td>2</td><td>16</td><td>0 to 65,535</td></tr>
+          <tr><td>signed int</td><td>2</td><td>16</td><td>-32,768 to 32,767</td></tr>
+          <tr><td>long</td><td>4</td><td>32</td><td>-2,147,483,648 to 2,147,483,647</td></tr>
+          <tr><td>unsigned long</td><td>4</td><td>32</td><td>0 to 4,294,967,295</td></tr>
+          <tr><td>signed long</td><td>4</td><td>32</td><td>-2,147,483,648 to 2,147,483,647</td></tr>
+        </table>
+
+        <h4 class="mini">Table 9.7 — char type modifiers</h4>
+        <table class="data-table">
+          <tr><th>Data type</th><th>Bytes</th><th>Range</th></tr>
+          <tr><td>char</td><td>1</td><td>-128 to 127</td></tr>
+          <tr><td>unsigned char</td><td>1</td><td>0 to 255</td></tr>
+          <tr><td>signed char</td><td>1</td><td>-128 to 127</td></tr>
+        </table>
+
+        <h4 class="mini">Table 9.8 — Floating point modifiers</h4>
+        <table class="data-table">
+          <tr><th>Data type</th><th>Bytes</th><th>Range</th></tr>
+          <tr><td>float</td><td>4</td><td>3.4×10⁻³⁸ to 3.4×10³⁸-1</td></tr>
+          <tr><td>double</td><td>8</td><td>1.7×10⁻³⁰⁸ to 1.7×10³⁰⁸-1</td></tr>
+          <tr><td>long double</td><td>10</td><td>3.4×10⁻⁴⁹³² to 1.1×10⁴⁹³²-1</td></tr>
+        </table>
+
+        <h4 class="mini">Table 9.9 — Turbo C++ vs Dev C++</h4>
+        <table class="data-table">
+          <tr><th>Data type</th><th>Turbo C++</th><th>Dev C++</th></tr>
+          <tr><td>short / unsigned / signed short</td><td>2</td><td>2</td></tr>
+          <tr><td>int / unsigned int / signed int</td><td>2</td><td>4</td></tr>
+          <tr><td>long / unsigned long / signed long</td><td>4</td><td>4</td></tr>
+          <tr><td>char / unsigned / signed char</td><td>1</td><td>1</td></tr>
+          <tr><td>float</td><td>4</td><td>4</td></tr>
+          <tr><td>double</td><td>8</td><td>8</td></tr>
+          <tr><td>long double</td><td>10</td><td>12</td></tr>
+        </table>
+
+        <div class="note"><b>Note (textbook):</b> <code class="inline">sizeof()</code> is an operator which gives the size of a data type. Since Dev C++ gives 4 bytes to int and long, either can be used for bigger integer values in Dev C++.</div>
+
+        <h3 class="sub">Number suffixes</h3>
+        <p>Suffixes let you store the same value as a different type: <code class="inline">L</code>/<code class="inline">l</code> for long, <code class="inline">U</code>/<code class="inline">u</code> for unsigned (e.g. <code class="inline">45L</code>, <code class="inline">45U</code>), and <code class="inline">F</code>/<code class="inline">f</code> for float (e.g. <code class="inline">3.14F</code>).</p>
+
+        <h3 class="sub">Try it: memory size explorer</h3>
+        <div class="sim">
+          <div class="sim-head"><span class="name">Pick a type + modifier</span></div>
+          <div class="field-inline">
+            <label>Base type</label>
+            <select id="memType" onchange="updateMemExplorer()" style="background:#0B1013;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:var(--font-mono);">
+              <option value="char">char</option>
+              <option value="int" selected>int</option>
+              <option value="float">float</option>
+              <option value="double">double</option>
+            </select>
+            <label>Modifier</label>
+            <select id="memMod" onchange="updateMemExplorer()" style="background:#0B1013;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:var(--font-mono);">
+              <option value="">none</option>
+              <option value="short">short</option>
+              <option value="long">long</option>
+              <option value="unsigned">unsigned</option>
+              <option value="signed">signed</option>
+            </select>
+          </div>
+          <div class="mem-row"><div class="mem-box" style="min-width:220px;"><div class="mb-head">Result</div><div class="mb-val" id="memResult" style="font-size:0.95rem;">int → 2 bytes</div><div class="mb-addr" id="memRange">-32,768 to 32,767</div></div></div>
+        </div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-datatypes')">← Back</button><button class="btn primary" onclick="go('p-variables')">Next: Variables →</button></div>
+      </section>
+
+      <!-- ================= VARIABLES ================= -->
+      <section class="panel" id="p-variables">
+        <div class="eyebrow">SECTION 9.13</div>
+        <h2 class="title">Variables</h2>
+        <p class="lead">Variables are user-defined names assigned to specific memory locations in which values are stored. Because they are named locations, they are also called <b>symbolic variables</b>.</p>
+
+        <div class="card">
+          <div class="card-title"><span class="tag textbook">Textbook definition</span>R-value and L-value</div>
+          <ul class="plain">
+            <li><b>R-value</b> — the data stored in a memory location</li>
+            <li><b>L-value</b> — the memory address in which the R-value is stored</li>
+          </ul>
+        </div>
+
+        <h4 class="mini">Syntax</h4>
+        <pre class="code"><span class="type">&lt;data type&gt;</span> &lt;variable name&gt;;
+<span class="cm">// example</span>
+<span class="type">int</span> num1;
+<span class="cm">// multiple variables of the same type</span>
+<span class="type">int</span> num1, num2, sum;</pre>
+
+        <h3 class="sub">Simulation: declare variables &amp; watch memory</h3>
+        <p class="muted">The textbook's Figure 9.15 shows <code class="inline">int num1, num2, sum;</code> allocating one memory box per variable. Declare a variable below and see what happens before it is given a value.</p>
+        <div class="sim">
+          <div class="sim-head"><span class="name">Variable declaration simulator</span></div>
+          <div class="field-inline">
+            <label>Variable name</label>
+            <input type="text" id="varNameInput" value="num1" style="width:100px;"/>
+            <label>Type</label>
+            <select id="varTypeInput" style="background:#0B1013;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:var(--font-mono);">
+              <option value="int">int</option><option value="char">char</option><option value="float">float</option>
+            </select>
+            <button class="btn primary" onclick="declareVar()">Declare (uninitialized)</button>
+          </div>
+          <div class="mem-row" id="varDeclareRow"></div>
+          <div class="sim-explain" id="varDeclareExplain">Declare a variable to see it get memory space with a random <b>junk / garbage value</b> — because no value was assigned yet.</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><span class="tag textbook">Illustration</span>Program with junk values</div>
+            <pre class="code"><span class="type">int</span> num1, num2, sum;
+cout &lt;&lt; num1 &lt;&lt; endl;
+cout &lt;&lt; num2 &lt;&lt; endl;
+cout &lt;&lt; num1 + num2;</pre>
+            <p class="muted" style="font-size:0.85rem;margin:0;">Because num1 and num2 are never given a value, they hold unknown <b>"Junk"</b> or <b>"Garbage"</b> values, and their sum is unpredictable.</p>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="tag exam">Exam point</span></div>
+            <p style="margin:0;">Always initialize a variable before using it in an expression — otherwise the result is unpredictable garbage, not zero.</p>
+          </div>
+        </div>
+
+        <div class="note"><b>Common mistake:</b> assuming an uninitialized variable automatically starts at 0. In C++ it does not — it holds whatever was already in that memory location.</div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-memory')">← Back</button><button class="btn primary" onclick="go('p-init')">Next: Initialization →</button></div>
+      </section>
+
+      <!-- ================= INITIALIZATION ================= -->
+      <section class="panel" id="p-init">
+        <div class="eyebrow">SECTION 9.13.2 – 9.13.3</div>
+        <h2 class="title">Initialization &amp; Dynamic Initialization</h2>
+        <p class="lead">Assigning an initial value to a variable during its declaration is called <b>initialization</b>.</p>
+
+        <pre class="code"><span class="type">int</span> num = 100;
+<span class="type">float</span> pi = 3.14;
+<span class="type">double</span> price = 231.45;
+<span class="cm">// same-type variables, single statement</span>
+<span class="type">int</span> x1 = -1, x2 = 1, x3, n;</pre>
+
+        <h3 class="sub">Illustration 9.6 — Curved Surface Area of a cylinder</h3>
+        <p class="muted">Step through this textbook program with your own radius and height.</p>
+        <div class="sim">
+          <div class="sim-head"><span class="name">CSA stepper</span><span class="step-indicator" id="csaStepLabel">Step 0 / 3</span></div>
+          <pre class="code"><span data-line="0"><span class="type">float</span> pi = 3.14, radius, height, CSA;</span>
+<span data-line="1">cin &gt;&gt; radius;   <span class="cm">// Enter Radius (in cm)</span></span>
+<span data-line="2">cin &gt;&gt; height;   <span class="cm">// Enter Height (in cm)</span></span>
+<span data-line="3">CSA = (2*pi*radius)*height;</span></pre>
+          <div class="field-inline">
+            <label>Radius (cm)</label><input type="number" id="csaR" value="7"/>
+            <label>Height (cm)</label><input type="number" id="csaH" value="20"/>
+          </div>
+          <div class="mem-row">
+            <div class="mem-box"><div class="mb-head">pi (float)</div><div class="mb-val">3.14</div></div>
+            <div class="mem-box" id="csaBoxR"><div class="mb-head">radius</div><div class="mb-val" id="csaValR">?</div></div>
+            <div class="mem-box" id="csaBoxH"><div class="mb-head">height</div><div class="mb-val" id="csaValH">?</div></div>
+            <div class="mem-box" id="csaBoxCSA"><div class="mb-head">CSA</div><div class="mb-val" id="csaValCSA">?</div></div>
+          </div>
+          <div class="btn-row"><button class="btn primary" onclick="csaStep()">Next step ▶</button><button class="btn" onclick="csaReset()">Reset ↺</button></div>
+          <div class="sim-explain" id="csaExplain">Enter values and click "Next step".</div>
+        </div>
+
+        <h3 class="sub">Dynamic Initialization</h3>
+        <p>A variable initialized <b>during execution</b> (using values known only at run time) uses dynamic initialization.</p>
+        <pre class="code"><span class="cm">// combining two statements into one:</span>
+<span class="type">int</span> num1, num2, sum;
+sum = num1 + num2;
+<span class="cm">// becomes dynamic initialization:</span>
+<span class="type">int</span> sum = num1 + num2;</pre>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><span class="tag textbook">Illustration 9.7</span>Average of two numbers</div>
+            <pre class="code"><span class="type">int</span> num1, num2;
+cin &gt;&gt; num1;   <span class="cm">// 78</span>
+cin &gt;&gt; num2;   <span class="cm">// 65</span>
+<span class="type">int</span> sum = num1 + num2; <span class="cm">// dynamic init</span>
+cout &lt;&lt; sum / 2;</pre>
+            <div class="output-box">Average: 71</div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="tag textbook">Illustration 9.8</span>Perimeter &amp; area of a semicircle</div>
+            <pre class="code"><span class="type">int</span> radius;
+<span class="type">float</span> pi = 3.14;
+cin &gt;&gt; radius; <span class="cm">// 14</span>
+<span class="type">float</span> perimeter = (pi+2)*radius;
+<span class="type">float</span> area = (pi*radius*radius)/2;</pre>
+            <div class="output-box">Perimeter: 71.96 cm
+Area: 307.72 sq.cm</div>
+          </div>
+        </div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-variables')">← Back</button><button class="btn primary" onclick="go('p-constref')">Next: const &amp; References →</button></div>
+      </section>
+
+      <!-- ================= CONST & REFERENCES ================= -->
+      <section class="panel" id="p-constref">
+        <div class="eyebrow">SECTION 9.13.4 – 9.13.5</div>
+        <h2 class="title">The const Access Modifier &amp; References</h2>
+
+        <h3 class="sub">const</h3>
+        <p><code class="inline">const</code> is the keyword used to declare a constant. It modifies / restricts the accessibility of a variable, so it is known as an <b>Access modifier</b>. Once declared <code class="inline">const</code>, a variable's value can never be changed during execution.</p>
+
+        <div class="sim">
+          <div class="sim-head"><span class="name">const violation simulator</span></div>
+          <pre class="code"><span class="kw">const</span> <span class="type">int</span> num = 100;
+cout &lt;&lt; num;
+num = num + 1;   <span class="cm">// try to change it</span></pre>
+          <div class="btn-row"><button class="btn primary" onclick="constSim()">Run this program</button><button class="btn" onclick="constReset()">Reset</button></div>
+          <div class="output-box" id="constOutput" style="display:none;"></div>
+          <div class="sim-explain" id="constExplain">Click "Run this program" to see what the compiler does.</div>
+        </div>
+
+        <div class="exam-point"><b>Exam point:</b> Turbo compiler reports <i>"Cannot modify the const object"</i>; Dev C++ reports <i>"assignment of read only memory num"</i>.</div>
+
+        <h3 class="sub">References</h3>
+        <p>A reference provides an <b>alias</b> (another name) for a previously defined variable. It is declared using a base type and an <code class="inline">&amp;</code> symbol.</p>
+        <pre class="code">&lt;type&gt; &lt;&amp; reference_variable&gt; = &lt;original_variable&gt;;</pre>
+
+        <div class="sim">
+          <div class="sim-head"><span class="name">Reference / alias simulator</span></div>
+          <pre class="code"><span class="type">int</span> num;
+<span class="type">int</span> &amp;temp = num;   <span class="cm">// temp is now an alias for num</span>
+num = <span id="refInputDisplay">100</span>;</pre>
+          <div class="field-inline"><label>Assign to num:</label><input type="number" id="refInput" value="100"/><button class="btn primary" onclick="refSim()">Run</button></div>
+          <div class="mem-row">
+            <div class="mem-box" id="refBoxNum"><div class="mb-head">num</div><div class="mb-val" id="refValNum">?</div><div class="mb-addr">0x125e</div></div>
+            <div class="mem-box" id="refBoxTemp"><div class="mb-head">temp (alias)</div><div class="mb-val" id="refValTemp">?</div><div class="mb-addr">same address: 0x125e</div></div>
+          </div>
+          <div class="sim-explain" id="refExplain">temp shares num's memory address — changing num also changes what temp shows, because they are the same memory location.</div>
+        </div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-init')">← Back</button><button class="btn primary" onclick="go('p-format')">Next: Formatting Output →</button></div>
+      </section>
+
+      <!-- ================= FORMATTING OUTPUT ================= -->
+      <section class="panel" id="p-format">
+        <div class="eyebrow">SECTION 9.14</div>
+        <h2 class="title">Formatting Output</h2>
+        <p class="lead">Manipulators are functions designed to work with <code class="inline">&lt;&lt;</code> and <code class="inline">&gt;&gt;</code> to format output for easy reading. Commonly used ones: <code class="inline">endl</code>, <code class="inline">setw</code>, <code class="inline">setfill</code>, <code class="inline">setprecision</code>, <code class="inline">setf</code>.</p>
+
+        <div class="note"><code class="inline">endl</code> is a member of the <code class="inline">iostream</code> header. <code class="inline">setw</code>, <code class="inline">setfill</code>, <code class="inline">setprecision</code>, <code class="inline">setf</code> are members of the <code class="inline">iomanip</code> header.</div>
+
+        <h3 class="sub">endl vs '\n'</h3>
+        <table class="data-table">
+          <tr><th>Manipulator</th><th>What it does</th></tr>
+          <tr><td><code class="inline">endl</code></td><td>Inserts a new line <b>and</b> flushes the buffer (flush = clean the buffer)</td></tr>
+          <tr><td><code class="inline">'\n'</code></td><td>Inserts only a new line</td></tr>
+        </table>
+
+        <h3 class="sub">setw() — field width</h3>
+        <p><code class="inline">setw(number)</code> sets the minimum number of characters for the next output field. Values are shown <b>right-aligned</b> within that field width.</p>
+        <div class="sim">
+          <div class="sim-head"><span class="name">setw() playground</span></div>
+          <pre class="code">cout&lt;&lt;setw(<span id="setwN1Display">25</span>)&lt;&lt;<span class="str">"Basic Pay : "</span>&lt;&lt;setw(<span id="setwN2Display">10</span>)&lt;&lt;basic&lt;&lt;endl;</pre>
+          <div class="field-inline">
+            <label>Field 1 width</label><input type="number" id="setwN1" value="25" style="width:70px;"/>
+            <label>Field 2 width</label><input type="number" id="setwN2" value="10" style="width:70px;"/>
+            <label>basic value</label><input type="text" id="setwVal" value="12000" style="width:90px;"/>
+            <button class="btn primary" onclick="setwRun()">Format</button>
+          </div>
+          <div class="output-box" id="setwOutput" style="white-space:pre;"></div>
+          <div class="sim-explain">Field 1 reserves the given width for the label text, field 2 reserves width for the value — both right-aligned, padded with spaces on the left.</div>
+        </div>
+
+        <h4 class="mini">Illustration 9.10 — Net salary program</h4>
+        <div class="output-box">Basic Pay :      12000
+Dearness Allowance :       1250
+House Rent Allowance :       1450
+Gross Pay :      14700
+G.P.F :       1325
+Income Tax :       1470
+Net Pay :      11905</div>
+
+        <h3 class="sub">setprecision() — controlling digits</h3>
+        <p>Displays numbers with fractions in a specific number of digits, counted <b>left to right</b> (unless <code class="inline">fixed</code> or <code class="inline">scientific</code> is set, in which case it counts decimal places only).</p>
+        <div class="sim">
+          <div class="sim-head"><span class="name">setprecision() playground</span></div>
+          <pre class="code"><span class="type">float</span> hra = <span id="precValDisplay">1200.123</span>;
+cout &lt;&lt; setprecision(<span id="precNDisplay">5</span>) &lt;&lt; hra;</pre>
+          <div class="field-inline">
+            <label>Value</label><input type="text" id="precVal" value="1200.123" style="width:110px;"/>
+            <label>precision(n)</label><input type="number" id="precN" value="5" style="width:70px;"/>
+            <label>Mode</label>
+            <select id="precMode" style="background:#0B1013;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:var(--font-mono);">
+              <option value="default">default</option>
+              <option value="fixed">fixed</option>
+              <option value="scientific">scientific</option>
+            </select>
+            <button class="btn primary" onclick="precRun()">Run</button>
+          </div>
+          <div class="output-box" id="precOutput"></div>
+          <div class="sim-explain" id="precExplain">"default" mode counts total significant digits left-to-right. "fixed" mode fixes the number of digits after the decimal point.</div>
+        </div>
+
+        <div class="exam-point"><b>Exam examples from text:</b> default <code class="inline">setprecision(5)</code> on 1200.123 → <b>1200.1</b>. With <code class="inline">ios::fixed</code>, <code class="inline">setprecision(2)</code> on 0.1 → <b>0.10</b>. With <code class="inline">ios::scientific</code>, <code class="inline">setprecision(2)</code> on 0.1 → <b>1.00e-001</b>.</div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-constref')">← Back</button><button class="btn primary" onclick="go('p-expr')">Next: Expressions →</button></div>
+      </section>
+
+      <!-- ================= EXPRESSIONS ================= -->
+      <section class="panel" id="p-expr">
+        <div class="eyebrow">SECTION 9.15</div>
+        <h2 class="title">Expressions</h2>
+        <p class="lead">An expression is a combination of operators, constants and variables arranged as per the rules of C++. It may consist of one or more operands and zero or more operators, and may include function calls that return values. There are <b>seven types</b> of expressions in C++.</p>
+
+        <table class="data-table">
+          <tr><th>#</th><th>Expression</th><th>Description</th><th>Example</th></tr>
+          <tr><td>1</td><td>Constant Expression</td><td>Consists only of constant values</td><td><code class="inline">int num=100;</code></td></tr>
+          <tr><td>2</td><td>Integer Expression</td><td>Combination of integer/character values or variables with simple arithmetic operators to produce integer results</td><td><code class="inline">sum=num1+num2;</code></td></tr>
+          <tr><td>3</td><td>Float Expression</td><td>Combination of floating point values/variables with arithmetic operators to produce floating point results</td><td><code class="inline">Area=3.14*r*r;</code></td></tr>
+          <tr><td>4</td><td>Relational Expression</td><td>Combination with relational operators to produce bool (true=1, false=0) results</td><td><code class="inline">x&gt;y;</code></td></tr>
+          <tr><td>5</td><td>Logical Expression</td><td>Combination with logical operators to produce bool results</td><td><code class="inline">(a&gt;b)&amp;&amp;(c==10);</code></td></tr>
+          <tr><td>6</td><td>Bitwise Expression</td><td>Combination with bitwise operators</td><td><code class="inline">x&gt;&gt;3;</code></td></tr>
+          <tr><td>7</td><td>Pointer Expression</td><td>A pointer holds a memory address; pointer variables are declared with <code class="inline">*</code></td><td><code class="inline">int *ptr;</code></td></tr>
+        </table>
+
+        <h3 class="sub">Try it: classify the expression</h3>
+        <div class="quiz-card" id="exprClassQuiz"></div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-format')">← Back</button><button class="btn primary" onclick="go('p-conv')">Next: Type Conversion →</button></div>
+      </section>
+
+      <!-- ================= TYPE CONVERSION ================= -->
+      <section class="panel" id="p-conv">
+        <div class="eyebrow">SECTION 9.16</div>
+        <h2 class="title">Type Conversion</h2>
+        <p class="lead">Converting one fundamental data type into another is called <b>Type Conversion</b>. C++ provides two kinds: implicit and explicit.</p>
+
+        <h3 class="sub">Implicit (automatic) type conversion</h3>
+        <p>Performed by the compiler automatically, whenever different data types are mixed in one expression. The rule: the "smaller" type is converted to the "wider" type — this is called <b>Type Promotion</b>.</p>
+        <pre class="code"><span class="type">int</span> a=6;
+<span class="type">float</span> b=3.14;
+cout &lt;&lt; a+b;</pre>
+        <div class="output-box">9.14</div>
+        <p class="muted" style="font-size:0.85rem;">a (int) is converted to float because float is wider than int.</p>
+
+        <h4 class="mini">Table 9.11 — Implicit conversion of mixed operands</h4>
+        <p class="muted">Pick a Left Hand Operand (LHO) type and a Right Hand Operand (RHO) type to see what the result type becomes.</p>
+        <div class="sim">
+          <div class="field-inline">
+            <label>LHO</label>
+            <select id="convLHO" onchange="updateConvMatrix()" style="background:#0B1013;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:var(--font-mono);"></select>
+            <label>RHO</label>
+            <select id="convRHO" onchange="updateConvMatrix()" style="background:#0B1013;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-family:var(--font-mono);"></select>
+          </div>
+          <div class="mem-row"><div class="mem-box" style="min-width:200px;"><div class="mb-head">Result type</div><div class="mb-val" id="convResult" style="font-size:1rem;">—</div></div></div>
+        </div>
+
+        <h3 class="sub">Explicit type conversion (type casting)</h3>
+        <p>The programmer explicitly converts a variable/expression to a specific data type.</p>
+        <pre class="code">(type-name) expression;
+<span class="cm">// example</span>
+<span class="type">float</span> varf=78.685;
+cout &lt;&lt; (int) varf;</pre>
+        <div class="output-box">78</div>
+
+        <h4 class="mini">Table 9.12 — Explicit conversion problems</h4>
+        <table class="data-table">
+          <tr><th>Conversion</th><th>Problem</th></tr>
+          <tr><td>double to float</td><td>Loss of precision. If the value is out of range for the target type, the result is undefined.</td></tr>
+          <tr><td>float to int</td><td>Loss of fractional part. If out of range for target type, result is undefined.</td></tr>
+          <tr><td>long to short</td><td>Loss of data.</td></tr>
+        </table>
+
+        <div class="sim">
+          <div class="sim-head"><span class="name">Cast-and-see simulator</span></div>
+          <pre class="code"><span class="type">double</span> varf = <span id="castValDisplay">178.25255685</span>;
+cout &lt;&lt; (float) varf &lt;&lt; endl;
+cout &lt;&lt; (int) varf &lt;&lt; endl;</pre>
+          <div class="field-inline"><label>double value</label><input type="text" id="castVal" value="178.25255685" style="width:150px;"/><button class="btn primary" onclick="castRun()">Cast it</button></div>
+          <div class="output-box" id="castOutput"></div>
+        </div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-expr')">← Back</button><button class="btn primary" onclick="go('p-debug')">Next: Debugging Lab →</button></div>
+      </section>
+
+      <!-- ================= DEBUG LAB ================= -->
+      <section class="panel" id="p-debug">
+        <div class="eyebrow">PRACTICE</div>
+        <h2 class="title">Debugging Lab</h2>
+        <p class="lead">Each program below has one mistake based on a concept from this chapter. Try to spot it before revealing the fix.</p>
+
+        <div class="card" id="debugCard1">
+          <div class="card-title"><span class="tag textbook">Debug #1</span> Logical error — uninitialized variables</div>
+          <div class="err-block">
+            <div class="err-col bad"><h5>❌ CODE</h5>
+              <pre class="code" style="margin:0;"><span class="type">int</span> num1, num2, sum;
+sum = num1 + num2;
+cout &lt;&lt; sum;</pre>
+            </div>
+            <div class="err-col good" id="fix1" style="display:none;"><h5>✅ WHAT'S WRONG</h5>
+              <p style="margin:0;font-size:0.85rem;">num1 and num2 were declared but never given values — they hold garbage. Fix: read them with <code class="inline">cin</code> or assign values before adding.</p>
+            </div>
+          </div>
+          <button class="btn" onclick="document.getElementById('fix1').style.display='block'">Reveal explanation</button>
+        </div>
+
+        <div class="card" id="debugCard2">
+          <div class="card-title"><span class="tag textbook">Debug #2</span> Runtime/compile error — modifying a constant</div>
+          <div class="err-block">
+            <div class="err-col bad"><h5>❌ CODE</h5>
+              <pre class="code" style="margin:0;"><span class="kw">const</span> <span class="type">int</span> num=100;
+num = num + 1;
+cout &lt;&lt; num;</pre>
+            </div>
+            <div class="err-col good" id="fix2" style="display:none;"><h5>✅ WHAT'S WRONG</h5>
+              <p style="margin:0;font-size:0.85rem;">num is declared const, so its value can never change after initialization. The compiler rejects <code class="inline">num = num + 1;</code>. Fix: remove const, or use a normal (non-const) variable if the value needs to change.</p>
+            </div>
+          </div>
+          <button class="btn" onclick="document.getElementById('fix2').style.display='block'">Reveal explanation</button>
+        </div>
+
+        <div class="card" id="debugCard3">
+          <div class="card-title"><span class="tag textbook">Debug #3</span> Data type mismatch</div>
+          <div class="err-block">
+            <div class="err-col bad"><h5>❌ CODE</h5>
+              <pre class="code" style="margin:0;"><span class="kw">long</span> <span class="type">float</span> x;</pre>
+            </div>
+            <div class="err-col good" id="fix3" style="display:none;"><h5>✅ WHAT'S WRONG</h5>
+              <p style="margin:0;font-size:0.85rem;"><code class="inline">long</code> is a valid modifier for integer types, but there is no such combination as "long float" in C++ — the modifier for extra floating-point precision is <code class="inline">long double</code>, not <code class="inline">long float</code>.</p>
+            </div>
+          </div>
+          <button class="btn" onclick="document.getElementById('fix3').style.display='block'">Reveal explanation</button>
+        </div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-conv')">← Back</button><button class="btn primary" onclick="go('p-quiz')">Next: Quick Quiz →</button></div>
+      </section>
+
+      <!-- ================= QUIZ ================= -->
+      <section class="panel" id="p-quiz">
+        <div class="eyebrow">PRACTICE</div>
+        <h2 class="title">Quick Quiz</h2>
+        <p class="lead">Test what you've learned. Pick an answer to get instant feedback.</p>
+        <div id="quizContainer"></div>
+        <div class="card" style="text-align:center;">
+          <p style="margin:0;">Score: <b id="quizScore">0</b> / <span id="quizTotal">0</span></p>
+        </div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-debug')">← Back</button><button class="btn primary" onclick="go('p-exam')">Next: Exam Preparation →</button></div>
+      </section>
+
+      <!-- ================= EXAM PREP ================= -->
+      <section class="panel" id="p-exam">
+        <div class="eyebrow">REVISION</div>
+        <h2 class="title">Exam Preparation</h2>
+
+        <h3 class="sub">Points to Remember <span class="tag textbook" style="margin-left:8px;">Textbook summary</span></h3>
+        <ul class="plain">
+          <li>Every programming language has two fundamental elements: data types and variables.</li>
+          <li>C++ data types fall into three categories: (1) Built-in data types (2) User-defined data types (3) Derived data types.</li>
+          <li>Variables are named spaces to hold values of a certain data type.</li>
+          <li>There are five fundamental data types in C++: char, int, float, double and void.</li>
+          <li>The C++ compiler allocates specific memory space for each data item according to the compiler's standards.</li>
+          <li>Variables are user-defined names assigned to a memory location in which values are stored.</li>
+          <li>Declaration instructs the compiler to allocate memory as per the type specified with the variable name.</li>
+          <li>Manipulators format output; they work with the insertion (&lt;&lt;) and extraction (&gt;&gt;) operators.</li>
+          <li>An expression is a combination of operators, constants and variables arranged per the rules of C++.</li>
+          <li>Type Conversion means converting one fundamental data type into another — implicit or explicit.</li>
+        </ul>
+
+        <h3 class="sub">Must Know</h3>
+        <div class="grid-2">
+          <div class="card"><p style="margin:0;"><b>5 fundamental types:</b> char, int, float, double, void — with their exact byte sizes (1, 2, 4, 8 bytes).</p></div>
+          <div class="card"><p style="margin:0;"><b>4 modifiers:</b> signed, unsigned, long, short — usable on any fundamental type except void.</p></div>
+          <div class="card"><p style="margin:0;"><b>R-value vs L-value:</b> R-value is the data; L-value is the memory address.</p></div>
+          <div class="card"><p style="margin:0;"><b>const</b> locks a variable's value permanently after initialization.</p></div>
+          <div class="card"><p style="margin:0;"><b>endl</b> flushes the buffer; <b>'\n'</b> does not.</p></div>
+          <div class="card"><p style="margin:0;"><b>7 expression types:</b> Constant, Integer, Float, Relational, Logical, Bitwise, Pointer.</p></div>
+        </div>
+
+        <h3 class="sub">Important Programs</h3>
+        <ul class="plain">
+          <li>Illustration 9.3 — ASCII code to character (int ↔ char)</li>
+          <li>Illustration 9.6 — Curved Surface Area of a cylinder (initialization)</li>
+          <li>Illustration 9.7 &amp; 9.8 — Dynamic initialization</li>
+          <li>Illustration 9.9 — Reference variable</li>
+          <li>Illustration 9.10 — Net salary using setw()</li>
+        </ul>
+
+        <h3 class="sub">Evaluate Yourself — Textbook Questions</h3>
+        <h4 class="mini">After 9.12.1 (Fundamental data types)</h4>
+        <ul class="plain">
+          <li>What do you mean by fundamental data types?</li>
+          <li>The data type char is used to represent characters. Then why is it often termed as an integer type?</li>
+          <li>What is the advantage of floating point numbers over integers?</li>
+          <li>The data type double is another floating point type. Why is it treated as a distinct data type?</li>
+          <li>What is the use of void data type?</li>
+        </ul>
+        <h4 class="mini">After 9.13.5 (Variables &amp; references)</h4>
+        <ul class="plain">
+          <li>What are modifiers? What is the use of modifiers?</li>
+          <li>What is wrong with the following C++ statement: <code class="inline">long float x;</code></li>
+          <li>What is a variable? Why is a variable called symbolic variable?</li>
+          <li>What do you mean by dynamic initialization of a variable? Give an example.</li>
+          <li>What is wrong with the following statement: <code class="inline">const int x;</code></li>
+        </ul>
+        <h4 class="mini">After 9.16 (Type conversion)</h4>
+        <ul class="plain">
+          <li>What is meant by type conversion?</li>
+          <li>How is implicit conversion different from explicit conversion?</li>
+          <li>What is the difference between endl and \n?</li>
+          <li>What is the use of references?</li>
+          <li>What is the use of setprecision()?</li>
+        </ul>
+
+        <h3 class="sub">Hands-on Practice — Textbook Exercises</h3>
+        <ul class="plain">
+          <li>Write C++ programs to interchange the values of two variables — (a) using a third variable, (b) without using a third variable.</li>
+          <li>Write C++ programs to: find the perimeter and area of a quadrant; find the area of a triangle; convert temperature from Celsius to Fahrenheit.</li>
+          <li>Write a C++ program to find the total and percentage of marks secured in the 10th Standard Public Exam. Display all marks one by one along with total and percentage, applying formatting functions.</li>
+        </ul>
+
+        <div class="note"><b>Note:</b> these are the exercises as they appear in the textbook. No previous-year exam questions were supplied with this chapter, so none are claimed here.</div>
+
+        <div class="panel-nav"><button class="btn" onclick="go('p-quiz')">← Back</button><div class="spacer"></div><button class="btn primary" onclick="markComplete()">Mark chapter complete ✓</button></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   NAVIGATION & PROGRESS
+   ============================================================ */
+const panelOrder = ['p-intro','p-datatypes','p-memory','p-variables','p-init','p-constref','p-format','p-expr','p-conv','p-debug','p-quiz','p-exam'];
+const panelTitles = {
+  'p-intro':'Introduction & Concept Map','p-datatypes':'Fundamental Data Types','p-memory':'Memory Representation & Modifiers',
+  'p-variables':'Variables','p-init':'Initialization & Dynamic Initialization','p-constref':'const & References',
+  'p-format':'Formatting Output','p-expr':'Expressions','p-conv':'Type Conversion','p-debug':'Debugging Lab',
+  'p-quiz':'Quick Quiz','p-exam':'Exam Preparation'
+};
+let visited = JSON.parse(localStorage.getItem('cpp9_visited')||'{}');
+
+function go(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelector('.nav-item[data-target="'+id+'"]').classList.add('active');
+  document.getElementById('topTitle').textContent = panelTitles[id];
+  window.scrollTo({top:0, behavior:'instant'});
+  document.getElementById('sidebar').classList.remove('open');
+  visited[id]=true;
+  saveProgress();
+}
+
+function markComplete(){ visited['p-exam']=true; saveProgress(); }
+
+function saveProgress(){
+  localStorage.setItem('cpp9_visited', JSON.stringify(visited));
+  const total = panelOrder.length;
+  const done = panelOrder.filter(id=>visited[id]).length;
+  const pct = Math.round((done/total)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressPct').textContent = pct+'%';
+  panelOrder.forEach(id=>{
+    const chk = document.getElementById('chk-'+id);
+    if(visited[id]){ chk.textContent='✓'; chk.classList.add('done'); }
+    else { chk.textContent='○'; chk.classList.remove('done'); }
+  });
+}
+saveProgress();
+
+/* LANGUAGE */
+function setLang(l){
+  document.body.setAttribute('data-lang', l);
+  document.getElementById('btnEn').classList.toggle('active', l==='en');
+  document.getElementById('btnTa').classList.toggle('active', l==='ta');
+  localStorage.setItem('cpp9_lang', l);
+}
+const savedLang = localStorage.getItem('cpp9_lang');
+if(savedLang) setLang(savedLang);
+
+/* CONCEPT MAP */
+const cmapSteps = ['Data Types','Variables','Initialization','const & References','Formatting Output','Expressions','Type Conversion'];
+document.getElementById('cmap').innerHTML = cmapSteps.map((s,i)=>
+  (i>0? '<div class="cmap-arrow">↓</div>' : '') + '<div class="cmap-node">'+s+'</div>'
+).join('');
+
+/* ============================================================
+   DATA TYPES: int truncation simulator
+   ============================================================ */
+function runIntSim(){
+  const raw = document.getElementById('intSimInput').value.trim();
+  const num = parseFloat(raw);
+  const box = document.getElementById('intSimBox');
+  const val = document.getElementById('intSimVal');
+  const disp = document.getElementById('intInputDisplay');
+  const explain = document.getElementById('intSimExplain');
+  if(isNaN(num)){ explain.innerHTML = '<b>Not a number.</b> Please enter a numeric value.'; return; }
+  const truncated = Math.trunc(num);
+  disp.textContent = raw;
+  val.textContent = truncated;
+  box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+  if(num !== truncated){
+    explain.innerHTML = '<b>What happened:</b> You tried to store '+raw+', but int only keeps whole numbers. The fractional part is dropped (not rounded) — so num becomes <b>'+truncated+'</b>.';
+  } else {
+    explain.innerHTML = '<b>What happened:</b> '+raw+' is already a whole number, so it is stored exactly as <b>'+truncated+'</b>.';
+  }
+}
+
+/* ============================================================
+   ASCII STEPPER (Illustration 9.3)
+   ============================================================ */
+let asciiStepNum = 0;
+const asciiExplains = [
+  'Line highlighted: <code class="inline">int n;</code> — memory is reserved for n, holding a junk value until assigned.',
+  'Line highlighted: <code class="inline">char ch;</code> — memory is reserved for ch, also holding a junk value.',
+  'The program prints the prompt asking the user to enter an ASCII code.',
+  'Line highlighted: <code class="inline">cin &gt;&gt; n;</code> — the value you entered is stored into n.',
+  'Line highlighted: <code class="inline">ch = n;</code> — n\'s value is assigned into ch. Since ch is a char, it interprets that number as an ASCII code and stores the matching character.',
+  'Line highlighted: the final cout prints the character equivalent to your ASCII code.'
+];
+function asciiHighlight(step){
+  document.querySelectorAll('#asciiCode [data-line]').forEach((el,i)=>{
+    el.classList.toggle('line-hl', i===step-2 && step>=2);
+  });
+}
+function asciiStep(){
+  const n = parseInt(document.getElementById('asciiInput').value);
+  if(isNaN(n) || n<0 || n>255){ document.getElementById('asciiExplain').innerHTML = 'Please enter a valid ASCII code between 0 and 255.'; return; }
+  asciiStepNum++;
+  if(asciiStepNum>5) asciiStepNum=5;
+  document.getElementById('asciiStepLabel').textContent = 'Step '+asciiStepNum+' / 5';
+  document.getElementById('asciiExplain').innerHTML = '<b>Step '+asciiStepNum+':</b> '+asciiExplains[asciiStepNum-1];
+  if(asciiStepNum>=1){ document.getElementById('asciiValN').textContent='junk'; document.getElementById('asciiBoxN').classList.add('junk'); }
+  if(asciiStepNum>=2){ document.getElementById('asciiValCh').textContent='junk'; document.getElementById('asciiBoxCh').classList.add('junk'); }
+  if(asciiStepNum>=4){ document.getElementById('asciiValN').textContent=n; document.getElementById('asciiBoxN').classList.remove('junk'); document.getElementById('asciiBoxN').classList.add('flash'); }
+  if(asciiStepNum>=5){ document.getElementById('asciiValCh').textContent=String.fromCharCode(n); document.getElementById('asciiBoxCh').classList.remove('junk'); document.getElementById('asciiBoxCh').classList.add('flash'); }
+  asciiHighlight(asciiStepNum);
+}
+function asciiReset(){
+  asciiStepNum=0;
+  document.getElementById('asciiStepLabel').textContent='Step 0 / 5';
+  document.getElementById('asciiValN').textContent='?'; document.getElementById('asciiValCh').textContent='?';
+  document.getElementById('asciiBoxN').classList.remove('junk','flash'); document.getElementById('asciiBoxCh').classList.remove('junk','flash');
+  document.getElementById('asciiExplain').innerHTML='Click "Next step" to begin execution.';
+  asciiHighlight(0);
+}
+
+/* ============================================================
+   MEMORY EXPLORER
+   ============================================================ */
+const memData = {
+  'char|':['1 byte','-128 to 127'], 'char|signed':['1 byte','-128 to 127'], 'char|unsigned':['1 byte','0 to 255'],
+  'char|short':['not valid','—'], 'char|long':['not valid','—'],
+  'int|':['2 bytes','-32,768 to 32,767'], 'int|short':['2 bytes','-32,768 to 32,767'], 'int|long':['4 bytes','-2,147,483,648 to 2,147,483,647'],
+  'int|unsigned':['2 bytes','0 to 65,535'], 'int|signed':['2 bytes','-32,768 to 32,767'],
+  'float|':['4 bytes','3.4×10⁻³⁸ to 3.4×10³⁸-1'], 'float|long':['10 bytes (long double)','3.4×10⁻⁴⁹³² to 1.1×10⁴⁹³²-1'],
+  'float|short':['not valid','—'], 'float|unsigned':['not valid','—'], 'float|signed':['4 bytes','3.4×10⁻³⁸ to 3.4×10³⁸-1'],
+  'double|':['8 bytes','1.7×10⁻³⁰⁸ to 1.7×10³⁰⁸-1'], 'double|long':['10 bytes (long double)','3.4×10⁻⁴⁹³² to 1.1×10⁴⁹³²-1'],
+  'double|short':['not valid','—'], 'double|unsigned':['not valid','—'], 'double|signed':['8 bytes','1.7×10⁻³⁰⁸ to 1.7×10³⁰⁸-1']
+};
+function updateMemExplorer(){
+  const t = document.getElementById('memType').value;
+  const m = document.getElementById('memMod').value;
+  const key = t+'|'+m;
+  const data = memData[key] || ['not valid combination','—'];
+  document.getElementById('memResult').textContent = (m? m+' '+t : t) + ' → ' + data[0];
+  document.getElementById('memRange').textContent = data[1];
+}
+updateMemExplorer();
+
+/* ============================================================
+   VARIABLE DECLARATION SIMULATOR
+   ============================================================ */
+let declaredVars = [];
+let memAddr = 0x125e;
+function declareVar(){
+  const name = document.getElementById('varNameInput').value.trim() || 'var';
+  const type = document.getElementById('varTypeInput').value;
+  const junkVals = {int:[Math.floor(Math.random()*30000-15000)], char:['\\x'+Math.floor(Math.random()*255).toString(16)], float:[(Math.random()*1000).toFixed(3)]};
+  const junk = junkVals[type][0];
+  memAddr += 4;
+  declaredVars.push({name, type, junk, addr:'0x'+memAddr.toString(16)});
+  renderVars();
+}
+function renderVars(){
+  const row = document.getElementById('varDeclareRow');
+  row.innerHTML = declaredVars.map(v=>
+    '<div class="mem-box junk flash"><div class="mb-head">'+v.name+' ('+v.type+')</div><div class="mb-val">'+v.junk+'</div><div class="mb-addr">'+v.addr+'</div></div>'
+  ).join('');
+  document.getElementById('varDeclareExplain').innerHTML = declaredVars.length
+    ? '<b>'+declaredVars[declaredVars.length-1].name+'</b> was just given memory space, but no value was assigned — so it shows a random <b>junk / garbage value</b> until you initialize it.'
+    : 'Declare a variable to see it get memory space.';
+}
+
+/* ============================================================
+   CSA STEPPER (Illustration 9.6)
+   ============================================================ */
+let csaStepNum = 0;
+function csaHighlight(step){
+  document.querySelectorAll('#p-init [data-line]').forEach((el,i)=>{
+    el.classList.toggle('line-hl', i===step-1);
+  });
+}
+function csaStep(){
+  const r = parseFloat(document.getElementById('csaR').value);
+  const h = parseFloat(document.getElementById('csaH').value);
+  if(isNaN(r)||isNaN(h)){ document.getElementById('csaExplain').textContent='Please enter numeric radius and height.'; return; }
+  csaStepNum++;
+  if(csaStepNum>3) csaStepNum=3;
+  document.getElementById('csaStepLabel').textContent='Step '+csaStepNum+' / 3';
+  csaHighlight(csaStepNum);
+  if(csaStepNum===1){
+    document.getElementById('csaValR').textContent='junk'; document.getElementById('csaValH').textContent='junk'; document.getElementById('csaValCSA').textContent='junk';
+    document.getElementById('csaExplain').innerHTML='<b>Step 1:</b> pi, radius, height and CSA are declared. pi is initialized to 3.14; the others hold junk values.';
+  }
+  if(csaStepNum===2){
+    document.getElementById('csaValR').textContent=r; document.getElementById('csaBoxR').classList.add('flash');
+    document.getElementById('csaExplain').innerHTML='<b>Step 2:</b> radius is read from input and stored: <b>'+r+'</b>.';
+  }
+  if(csaStepNum===3){
+    document.getElementById('csaValH').textContent=h; document.getElementById('csaBoxH').classList.add('flash');
+    const csa = (2*3.14*r)*h;
+    document.getElementById('csaValCSA').textContent = csa.toFixed(2);
+    document.getElementById('csaBoxCSA').classList.add('flash');
+    document.getElementById('csaExplain').innerHTML='<b>Step 3:</b> height stored as <b>'+h+'</b>, then CSA = (2 × pi × radius) × height = <b>'+csa.toFixed(2)+' sq. cm</b>.';
+  }
+}
+function csaReset(){
+  csaStepNum=0; document.getElementById('csaStepLabel').textContent='Step 0 / 3';
+  ['csaValR','csaValH','csaValCSA'].forEach(id=>document.getElementById(id).textContent='?');
+  ['csaBoxR','csaBoxH','csaBoxCSA'].forEach(id=>document.getElementById(id).classList.remove('flash'));
+  document.getElementById('csaExplain').textContent='Enter values and click "Next step".';
+  csaHighlight(0);
+}
+
+/* ============================================================
+   CONST SIMULATOR
+   ============================================================ */
+function constSim(){
+  document.getElementById('constOutput').style.display='block';
+  document.getElementById('constOutput').textContent = "Value of num is = 100\nError: assignment of read-only variable 'num'";
+  document.getElementById('constExplain').innerHTML = '<b>What happened:</b> num was declared with <code class="inline">const</code>, so <code class="inline">num = num + 1;</code> is rejected by the compiler. The value 100 can never change.';
+}
+function constReset(){
+  document.getElementById('constOutput').style.display='none';
+  document.getElementById('constExplain').textContent = 'Click "Run this program" to see what the compiler does.';
+}
+
+/* ============================================================
+   REFERENCE SIMULATOR
+   ============================================================ */
+function refSim(){
+  const v = document.getElementById('refInput').value;
+  document.getElementById('refInputDisplay').textContent = v;
+  document.getElementById('refValNum').textContent = v;
+  document.getElementById('refValTemp').textContent = v;
+  document.getElementById('refBoxNum').classList.add('flash');
+  document.getElementById('refBoxTemp').classList.add('flash');
+}
+
+/* ============================================================
+   setw() PLAYGROUND
+   ============================================================ */
+function setwRun(){
+  const n1 = parseInt(document.getElementById('setwN1').value)||0;
+  const n2 = parseInt(document.getElementById('setwN2').value)||0;
+  const val = document.getElementById('setwVal').value;
+  document.getElementById('setwN1Display').textContent = n1;
+  document.getElementById('setwN2Display').textContent = n2;
+  const label = 'Basic Pay : ';
+  const field1 = label.length >= n1 ? label : ' '.repeat(n1-label.length)+label;
+  const field2 = val.length >= n2 ? val : ' '.repeat(n2-val.length)+val;
+  document.getElementById('setwOutput').textContent = field1+field2;
+}
+setwRun();
+
+/* ============================================================
+   setprecision() PLAYGROUND
+   ============================================================ */
+function precRun(){
+  const val = parseFloat(document.getElementById('precVal').value);
+  const n = parseInt(document.getElementById('precN').value);
+  const mode = document.getElementById('precMode').value;
+  document.getElementById('precValDisplay').textContent = document.getElementById('precVal').value;
+  document.getElementById('precNDisplay').textContent = n;
+  if(isNaN(val) || isNaN(n) || n<0){ document.getElementById('precOutput').textContent='Enter a valid value and precision.'; return; }
+  let out, explain;
+  if(mode==='fixed'){
+    out = val.toFixed(n);
+    explain = '"fixed" mode: exactly '+n+' digits after the decimal point.';
+  } else if(mode==='scientific'){
+    out = val.toExponential(n);
+    explain = '"scientific" mode: '+n+' digits after the decimal point, in exponential notation.';
+  } else {
+    out = val.toPrecision(n);
+    if(out.includes('e')) out = Number(out).toString();
+    explain = 'default mode: '+n+' significant digits counted left to right.';
+  }
+  document.getElementById('precOutput').textContent = out;
+  document.getElementById('precExplain').innerHTML = explain;
+}
+precRun();
+
+/* ============================================================
+   EXPRESSION CLASSIFY QUIZ
+   ============================================================ */
+const exprQ = [
+  {code:'int num=100;', ans:'Constant', opts:['Constant','Relational','Bitwise','Pointer']},
+  {code:'sum = num1 + num2;', ans:'Integer', opts:['Integer','Logical','Pointer','Bitwise']},
+  {code:'x > y;', ans:'Relational', opts:['Relational','Float','Constant','Pointer']},
+  {code:'(a>b) && (c==10);', ans:'Logical', opts:['Logical','Integer','Bitwise','Constant']},
+  {code:'int *ptr;', ans:'Pointer', opts:['Pointer','Bitwise','Float','Relational']},
+  {code:'x >> 3;', ans:'Bitwise', opts:['Bitwise','Logical','Constant','Integer']},
+  {code:'Area = 3.14 * r * r;', ans:'Float', opts:['Float','Integer','Constant','Relational']}
+];
+let exprQi = 0;
+function renderExprQ(){
+  const q = exprQ[exprQi];
+  const c = document.getElementById('exprClassQuiz');
+  c.innerHTML = '<div class="quiz-q">What type of expression is this? <br><span style="font-family:var(--font-mono);color:var(--teal);">'+q.code+'</span></div>'
+    + '<div class="quiz-opts">'+q.opts.map(o=>'<button class="opt-btn" onclick="answerExpr(this,\''+o+'\')">'+o+'</button>').join('')+'</div>'
+    + '<div class="feedback" id="exprFeedback"></div>'
+    + '<div class="btn-row"><button class="btn" onclick="nextExprQ()">Next example →</button></div>';
+}
+function answerExpr(btn, chosen){
+  const q = exprQ[exprQi];
+  const buttons = btn.parentElement.querySelectorAll('.opt-btn');
+  buttons.forEach(b=>{ b.disabled=true; if(b.textContent===q.ans) b.classList.add('correct'); });
+  const fb = document.getElementById('exprFeedback');
+  fb.classList.add('show');
+  if(chosen===q.ans){ fb.classList.add('ok'); fb.classList.remove('no'); fb.textContent = '🎉 Correct! This is a '+q.ans+' Expression.'; }
+  else { btn.classList.add('wrong'); fb.classList.add('no'); fb.classList.remove('ok'); fb.textContent = 'Not quite — this is actually a '+q.ans+' Expression.'; }
+}
+function nextExprQ(){ exprQi = (exprQi+1) % exprQ.length; renderExprQ(); }
+renderExprQ();
+
+/* ============================================================
+   TYPE CONVERSION MATRIX (Table 9.11)
+   ============================================================ */
+const convTypes = ['char','short','int','long','float','double','long double'];
+const convTable = {
+  'char':{'char':'int','short':'int','int':'int','long':'long','float':'float','double':'double','long double':'long double'},
+  'short':{'char':'int','short':'int','int':'int','long':'long','float':'float','double':'double','long double':'long double'},
+  'int':{'char':'int','short':'int','int':'int','long':'long','float':'float','double':'double','long double':'long double'},
+  'long':{'char':'long','short':'long','int':'long','long':'long','float':'float','double':'double','long double':'long double'},
+  'float':{'char':'float','short':'float','int':'float','long':'float','float':'float','double':'double','long double':'long double'},
+  'double':{'char':'double','short':'double','int':'double','long':'double','float':'double','double':'double','long double':'long double'},
+  'long double':{'char':'long double','short':'long double','int':'long double','long':'long double','float':'long double','double':'long double','long double':'long double'}
+};
+function initConvSelects(){
+  const lho = document.getElementById('convLHO');
+  const rho = document.getElementById('convRHO');
+  convTypes.forEach(t=>{
+    lho.innerHTML += '<option value="'+t+'">'+t+'</option>';
+    rho.innerHTML += '<option value="'+t+'">'+t+'</option>';
+  });
+  lho.value='int'; rho.value='float';
+}
+function updateConvMatrix(){
+  const l = document.getElementById('convLHO').value;
+  const r = document.getElementById('convRHO').value;
+  document.getElementById('convResult').textContent = convTable[l][r];
+}
+initConvSelects(); updateConvMatrix();
+
+/* ============================================================
+   CAST SIMULATOR
+   ============================================================ */
+function castRun(){
+  const v = parseFloat(document.getElementById('castVal').value);
+  document.getElementById('castValDisplay').textContent = document.getElementById('castVal').value;
+  if(isNaN(v)){ document.getElementById('castOutput').textContent='Enter a valid number.'; return; }
+  const asFloat = parseFloat(v.toPrecision(6));
+  const asInt = Math.trunc(v);
+  document.getElementById('castOutput').textContent = asFloat+String.fromCharCode(10)+asInt;
+}
+castRun();
+
+/* ============================================================
+   QUICK QUIZ
+   ============================================================ */
+const quizBank = [
+  {q:'How many fundamental data types are there in C++?', opts:['3','4','5','6'], ans:'5', why:'The five fundamental types are char, int, float, double and void.'},
+  {q:'What is the memory size of int (Turbo C++ standard)?', opts:['1 byte','2 bytes','4 bytes','8 bytes'], ans:'2 bytes', why:'Table 9.5 lists int as 2 bytes (16 bits) in the Turbo C++ standard used in the chapter.'},
+  {q:'What does the following print?\\nint num = 10.9;\\ncout << num;', opts:['10','11','10.9','Error'], ans:'10', why:'int only stores the integer portion; the fraction is discarded (not rounded).'},
+  {q:'Which manipulator flushes the output buffer as well as inserting a new line?', opts:["'\\\\n'",'endl','setw','setprecision'], ans:'endl', why:'endl inserts a new line and flushes the buffer; \\n only inserts a new line.'},
+  {q:'What kind of value does an uninitialized variable hold?', opts:['0','1','Garbage/Junk value','Empty string'], ans:'Garbage/Junk value', why:'C++ does not automatically set uninitialized variables to 0 — they hold whatever was already in that memory location.'},
+  {q:"Which keyword makes a variable's value unchangeable after initialization?", opts:['static','const','void','unsigned'], ans:'const', why:'const is the Access modifier that restricts a variable so its value can never change after initialization.'},
+  {q:'A reference variable is declared using which symbol?', opts:['*','&','#','%'], ans:'&', why:'A reference uses the & (ampersand) symbol and becomes an alias for the original variable.'},
+  {q:'int a=6; float b=3.14; cout<<a+b; — what type conversion happens?', opts:['Explicit casting','Implicit (int → float)','No conversion','Explicit (float → int)'], ans:'Implicit (int → float)', why:'The compiler automatically promotes the "smaller" int to the "wider" float type — this is implicit conversion / type promotion.'},
+  {q:'(int) varf — what kind of type conversion is this?', opts:['Implicit','Explicit (type casting)','Dynamic initialization','Reference'], ans:'Explicit (type casting)', why:'Using (type-name) before an expression is explicit type conversion, done deliberately by the programmer.'},
+  {q:'Which modifier cannot usually be applied to float?', opts:['long','short','signed','none of these'], ans:'short', why:"short (and unsigned) are not valid modifiers for floating point types in the textbook's tables."}
+];
+let quizScore = 0, quizAnswered = 0;
+function renderQuiz(){
+  const c = document.getElementById('quizContainer');
+  document.getElementById('quizTotal').textContent = quizBank.length;
+  c.innerHTML = quizBank.map((q,i)=>{
+    return '<div class="quiz-card">'
+      + '<div class="quiz-q">Q'+(i+1)+'. '+q.q.replace(/\\n/g,'<br>')+'</div>'
+      + '<div class="quiz-opts">'+q.opts.map(o=>'<button class="opt-btn" onclick="answerQuiz(this,'+i+',\''+o.replace(/'/g,"\\'")+'\')">'+o+'</button>').join('')+'</div>'
+      + '<div class="feedback" id="qf'+i+'"></div>'
+      + '</div>';
+  }).join('');
+}
+function answerQuiz(btn, idx, chosen){
+  const q = quizBank[idx];
+  const buttons = btn.parentElement.querySelectorAll('.opt-btn');
+  buttons.forEach(b=>{ b.disabled=true; if(b.textContent===q.ans) b.classList.add('correct'); });
+  const fb = document.getElementById('qf'+idx);
+  fb.classList.add('show');
+  quizAnswered++;
+  if(chosen===q.ans){ quizScore++; fb.classList.add('ok'); fb.textContent='🎉 Correct! '+q.why; }
+  else { btn.classList.add('wrong'); fb.classList.add('no'); fb.textContent='Not quite. '+q.why; }
+  document.getElementById('quizScore').textContent = quizScore;
+}
+renderQuiz();
+
+/* Init ASCII/csa highlight state */
+asciiReset(); csaReset();
+</script>
+</body>
+</html>
